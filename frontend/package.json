@@ -11,12 +11,17 @@
     "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
+    "@helia/http": "^2.0.0",
+    "@helia/unixfs": "^4.0.0",
+    "@tailwindcss/language-server": "^0.0.25",
+    "@vue/language-server": "^2.1.6",
     "@vueuse/core": "^10.11.0",
     "@web3modal/ethers5": "^5.0.11",
     "axios": "^1.7.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "ethers": "^5.7.2",
+    "helia": "^5.0.0",
     "lucide-vue-next": "^0.407.0",
     "pinia": "^2.1.7",
     "radix-vue": "^1.9.0",

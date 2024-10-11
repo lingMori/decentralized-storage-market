@@ -22,8 +22,8 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/',
         name: 'Home',
-        redirect: '/dashboard/upload'
-        // component: () => import("@/pages/Home.vue")
+        // redirect: '/dashboard/upload'
+        component: () => import("@/pages/Home.vue")
     }
 ]
 
