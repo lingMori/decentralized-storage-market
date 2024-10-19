@@ -5,19 +5,28 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import routerModule from "./router"
 import piniaModule from "./store"
-import heliaClientPlugin from "./lib/ipfs-client/helia-server/plugins/heliaClientPlugin"
-import type { HeliaServerConfig } from "./lib/ipfs-client/helia-server/core/helia-server.type"
+import dangoIPFS from "./lib/ipfs-client/dango-ipfs-ts/plugin/dangoIPFS"
+import type { dangoConfig } from "./lib/ipfs-client/dango-ipfs-ts/types/dango.type"
 
-const heliaConfig: HeliaServerConfig = {
-    host: 'api.filebase.io/v1',
-    // port: "v1",
-    protocol: 'https',
+const dangoRPCConfig:dangoConfig = {
+    protocol: 'http',
+    host: '10.130.144.181',
+    port: '15001',
+}
+
+const dangoGatewayConfig:dangoConfig = {
+    protocol: 'http',
+    host: '10.130.144.181',
+    port: '18080',
 }
 
 const storageApp = createApp(App);
 storageApp.use(routerModule);
 storageApp.use(piniaModule);
-storageApp.use(heliaClientPlugin, heliaConfig);
+storageApp.use(dangoIPFS, [
+    { config: dangoRPCConfig, protocolName: 'dangoRPC' },
+    { config: dangoGatewayConfig, protocolName: 'dangoGateway' }
+]);
 
 if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
     document.body.classList.add("dark-theme");

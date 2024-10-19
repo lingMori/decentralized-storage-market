@@ -31,16 +31,18 @@
 
   import { Button } from '@/components/ui/button';
   import { Input } from '@/components/ui/input';
+  import type { AxiosInstance } from 'axios';
+  import { CID, type KuboRPCClient } from 'kubo-rpc-client';
   import { inject, ref } from 'vue';
-  import createHeliaFile from '@/lib/ipfs-client/helia-server/core/heliaFile';
-  import type { Helia } from '@helia/http';
 
   const files = ref<File[]>([]);
   const isOpen = ref<boolean>(true)
   const keyName = ref('')
   const nodeName = ref('')
 
-  const heliaFS = createHeliaFile(inject('heliaClient') as Promise<Helia>)
+  const dangoIPFS_RPC = inject('dangoRPC') as KuboRPCClient;
+  const dangoIPFS_Gateway = inject('dangoGateway') as AxiosInstance;
+
 
   const handleFiles = (event: Event) => {
     const input = event.target as HTMLInputElement;
@@ -60,18 +62,15 @@
   
   const uploadToIPFS = async() => {
     try {
-      const formData = new FormData();
-      formData.append('file', files.value[0]);
-      const response = await (await heliaFS).addFile({
-        content: new Uint8Array(await files.value[0].arrayBuffer()), // Convert File to Uint8Array
-        path: files.value[0].name,
-      });
-
-      console.log(response.toString())
-
-    }catch (e) {
-      console.log(e)
+    // 使用 CID 从 IPFS 获取文件内容
+    // const decoder = new TextDecoder(); // 创建解码器用于将 Uint8Array 转换为字符串
+    for await (const bandwith of dangoIPFS_RPC.stats.bw({poll: true})){
+      console.log(bandwith)
     }
+
+  } catch (err) {
+    console.log('Error fetching file from IPFS:', err);
+  }
   }
   
   </script>
