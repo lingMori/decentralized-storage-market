@@ -1,6 +1,83 @@
-type ExampleEntity @entity {
+type FileRemoved @entity(immutable: true) {
   id: Bytes!
-  count: BigInt!
   owner: Bytes! # address
   cid: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type FileStatusUpdated @entity(immutable: true) {
+  id: Bytes!
+  owner: Bytes! # address
+  cid: String! # string
+  isActive: Boolean! # bool
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type FileUploaded @entity(immutable: true) {
+  id: Bytes!
+  owner: Bytes! # address
+  cid: String! # string
+  size: BigInt! # uint256
+  fileType: String! # string
+  fileName: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type FreeLoadUpdated @entity(immutable: true) {
+  id: Bytes!
+  ownerAddress: Bytes! # address
+  freeLoad: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type InstanceLockStatusUpdated @entity(immutable: true) {
+  id: Bytes!
+  owner: Bytes! # address
+  isLocked: Boolean! # bool
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type InstanceOwnerRegistered @entity(immutable: true) {
+  id: Bytes!
+  ownerAddress: Bytes! # address
+  freeLoad: BigInt! # uint256
+  isLocked: Boolean! # bool
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type OwnershipTransferred @entity(immutable: true) {
+  id: Bytes!
+  previousOwner: Bytes! # address
+  newOwner: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Paused @entity(immutable: true) {
+  id: Bytes!
+  account: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Unpaused @entity(immutable: true) {
+  id: Bytes!
+  account: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
 }

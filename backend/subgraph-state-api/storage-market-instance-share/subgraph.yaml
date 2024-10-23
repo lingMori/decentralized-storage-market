@@ -5,11 +5,11 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: InstaShare
+    name: InstaShre
     network: sepolia
     source:
       address: "0x034900Ea4dCFbed658cE74175520f08d5b952A66"
-      abi: InstaShare
+      abi: InstaShre
       startBlock: 6929014
     mapping:
       kind: ethereum/events
@@ -26,8 +26,8 @@ dataSources:
         - Paused
         - Unpaused
       abis:
-        - name: InstaShare
-          file: ./abis/InstaShare.json
+        - name: InstaShre
+          file: ./abis/InstaShre.json
       eventHandlers:
         - event: FileRemoved(address,string)
           handler: handleFileRemoved
@@ -47,4 +47,4 @@ dataSources:
           handler: handlePaused
         - event: Unpaused(address)
           handler: handleUnpaused
-      file: ./src/insta-share.ts
+      file: ./src/insta-shre.ts

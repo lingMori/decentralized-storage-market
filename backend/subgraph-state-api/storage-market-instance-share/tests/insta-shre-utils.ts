@@ -10,7 +10,7 @@ import {
   OwnershipTransferred,
   Paused,
   Unpaused
-} from "../generated/InstaShare/InstaShare"
+} from "../generated/InstaShre/InstaShre"
 
 export function createFileRemovedEvent(
   owner: Address,
