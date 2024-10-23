@@ -13,9 +13,9 @@ const routes: RouteRecordRaw[] = [
                 component:() => import("@/pages/dashboard/Upload.vue")
             },
             {
-                path: 'box',
-                name: 'Box',
-                component: () => import("@/pages/dashboard/Box.vue")
+                path: 'filebox',
+                name: 'Filebox',
+                component: () => import("@/pages/dashboard/Filebox.vue")
             }
         ]
     },

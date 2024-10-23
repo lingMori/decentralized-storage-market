@@ -29,9 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import type { IpfsResponseData, IpfsResponseDataObject, IpfsUploadResult } from '@/lib/ipfs-client/ipfsClient.type';
-import IpfsClient from '@/lib/ipfs-client/ipfsClient';
+import { computed, inject, ref } from 'vue';
 import useLocalStorage from '@/store/localStorageDB';
 
 const localStore = useLocalStorage();
@@ -55,11 +53,7 @@ const result = computed(() => {
   }
 })
 
-const ipfsClient = new IpfsClient({
-    protocol:"http",
-    host:"123.157.213.102",
-    port:'39761'
-})
+const ipfsClient = inject('dangoRPC') as IpfsClient;
 
 const onDragEnter = () => {
     isDragged.value = true;

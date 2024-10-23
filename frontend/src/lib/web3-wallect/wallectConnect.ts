@@ -2,15 +2,15 @@
 import { createWeb3Modal, defaultConfig } from '@web3modal/ethers5/vue';
 import { ref } from 'vue';
 // 1. Get projectId at https://cloud.walletconnect.com
-const projectId = 'YOUR_PROJECT_ID'
+const projectId = '922f050d93e9689768bf36aac1212c06'
 
 // 2. Set chains
-const mainnet = {
-  chainId: 1,
-  name: 'Ethereum',
-  currency: 'ETH',
-  explorerUrl: 'https://etherscan.io',
-  rpcUrl: 'https://cloudflare-eth.com'
+const sepolia = {
+  chainId: 11155111,
+  name: 'Sepolia',
+  currency: 'SepoliaETH',
+  explorerUrl: 'https://sepolia.etherscan.io',
+  rpcUrl: 'https://rpc.sepolia.org'
 }
 
 // 3. Create your application's metadata object
@@ -30,14 +30,14 @@ const ethersConfig = defaultConfig({
   enableEIP6963: true, // true by default
   enableInjected: true, // true by default
   enableCoinbase: true, // true by default
-  rpcUrl: '...', // used for the Coinbase SDK
-  defaultChainId: 1 // used for the Coinbase SDK
+  rpcUrl: sepolia.rpcUrl, // using Sepolia RPC URL
+  defaultChainId: 11155111 // Sepolia chain ID
 })
 
 // 5. Create a Web3Modal instance
 const walletconnect_model = createWeb3Modal({
   ethersConfig,
-  chains: [mainnet],
+  chains: [sepolia],
   projectId,
   enableAnalytics: true, // Optional - defaults to your Cloud configuration
   themeVariables: {

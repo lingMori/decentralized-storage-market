@@ -1,6 +1,8 @@
 <template>
-  <DashboardHeader />
-  <router-view></router-view>
+  <div style="height: 100vh;">
+    <DashboardHeader />
+    <router-view></router-view>
+  </div>
 </template>
 
 <script setup lang="ts">

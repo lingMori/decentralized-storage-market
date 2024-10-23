@@ -14,7 +14,7 @@
     
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 section#content {
   position: relative;
   height: 100%;

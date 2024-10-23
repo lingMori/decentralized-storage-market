@@ -8,7 +8,7 @@
       <nav class="header-navbar">
         <router-link :to="{ name: 'Upload' }" active-class="active" exact>Home</router-link>
 
-        <router-link :to="{ name: 'Box' }" active-class="active" exact>File Box</router-link>
+        <router-link :to="{ name: 'Filebox' }" active-class="active" exact>File Box</router-link>
 
         <a href="https://github.com/lingMori" target="_blank" rel="noopener">Github</a>
 
@@ -34,6 +34,7 @@ const toggleTheme = () => {
   requestAnimationFrame(toggleAnimation)
 
   isDark.value = !isDark.value
+  isDark.value ? document.body.classList.add("dark") : document.body.classList.remove("dark")
 }
 
 const toggleAnimation = () => {
