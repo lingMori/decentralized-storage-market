@@ -33,7 +33,7 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
     // Events
     event InstanceOwnerRegistered(address ownerAddress, uint256 freeLoad, bool isLocked);
     event FreeLoadUpdated(address ownerAddress, uint256 freeLoad);
-    event FileUploaded(address owner, string cid, uint256 size, string fileType);
+    event FileUploaded(address owner, string cid, uint256 size, string fileType, string fileName);
     event FileStatusUpdated(address owner, string cid, bool isActive);
     event FileRemoved(address owner, string cid);
     event InstanceLockStatusUpdated(address owner, bool isLocked);
@@ -81,7 +81,8 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
     function uploadFile(
         string calldata cid,
         uint256 fileSize,
-        string calldata fileType
+        string calldata fileType,
+        string calldata fileName
     ) public whenNotPaused onlyRegistered notLocked nonReentrant {
         if (fileSize == 0 || fileSize > 100 * 1024 * 1024) {
             revert InvalidFileSize();
@@ -113,7 +114,7 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
         owner.totalFiles++;
         owner.freeLoad -= fileSize;
 
-        emit FileUploaded(msg.sender, cid, fileSize, fileType);
+        emit FileUploaded(msg.sender, cid, fileSize, fileType, fileName);
         emit FreeLoadUpdated(msg.sender, owner.freeLoad);
     }
 
