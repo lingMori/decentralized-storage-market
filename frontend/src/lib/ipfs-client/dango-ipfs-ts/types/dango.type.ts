@@ -12,6 +12,15 @@ export interface dangoConfig {
     url?: string
 }
 
+export interface FileItem {
+    name: string
+    cid: string
+    status: 'active' | 'pending' | 'archived' | 'false'
+    lastModified: string
+    size: string
+    type: string
+}
+
 export interface DangoFileHandler {
     /**
      * Add a file or data to IPFS

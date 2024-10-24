@@ -25,15 +25,28 @@
                     </div>
                 </div>
         </div>
+        
     </section>
 </template>
 
 <script setup lang="ts">
 import { computed, inject, ref } from 'vue';
 import useLocalStorage from '@/store/localStorageDB';
+import type { AddResult, KuboRPCClient } from 'kubo-rpc-client';
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog';
+import type { FileItem } from '@/lib/ipfs-client/dango-ipfs-ts/types/dango.type';
 
 const localStore = useLocalStorage();
 
+const hasRegisted = ref<boolean>(false);
 const isDragged = ref<boolean>(false);
 const isUploading = ref<boolean>(false);
 const isUploaded = ref<boolean>(false);
@@ -48,12 +61,12 @@ const result = computed(() => {
   return {
     count: localStore.results.length,
     size: localStore.results.reduce((sum, result) => {
-      return sum + Number((result as IpfsResponseDataObject).Size);
+      return sum + Number((result as FileItem).size);
     }, 0)
   }
 })
 
-const ipfsClient = inject('dangoRPC') as IpfsClient;
+const ipfsClient = inject('dangoRPC') as KuboRPCClient;
 
 const onDragEnter = () => {
     isDragged.value = true;
@@ -77,10 +90,26 @@ const onDropHandler = (event:DragEvent) => {
     }
 }
 
-const uploadFileHander = async(file:File):Promise<IpfsUploadResult> => {
-  const res = await ipfsClient.uploadFile(file);
-  finished.value ++;
-  return res;
+const uploadFileHandler = async(file:File):Promise<FileItem> => {
+  try {
+    const response:AddResult = await ipfsClient.add(file);
+    const filePackage:FileItem = {
+      name: file.name,
+      cid: response.cid.toString(),
+      status: 'active',
+      lastModified: file.lastModified.toString(),  // Use `file.lastModified`
+      size: file.size.toString(),                 // Use `file.size`
+      type: file.type                             // Use `file.type`
+    } as FileItem
+
+    return filePackage;
+
+  } catch (error) {
+    console.log('upload file error', error);
+  }
+
+  finished.value++;
+  return {} as FileItem;  // Return empty object if error occurs
 }
 
 const onFileChangeHandler = async() => {
@@ -91,7 +120,7 @@ const onFileChangeHandler = async() => {
         const files:FileList = fileRef.value?.files;
         localStore.addFiles(files);
     
-        const handlers = localStore.files.map(file => uploadFileHander(file));
+        const handlers = localStore.files.map(file => uploadFileHandler(file));
 
         try {
           let results = await Promise.all(handlers);

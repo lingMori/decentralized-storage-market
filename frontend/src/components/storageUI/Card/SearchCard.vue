@@ -1,222 +1,188 @@
 <template>
-    <section id="panel-result">
-        <div class="panel-result--content">
-          <SearchInput :search="search" :count="files.length" @on-changed="onSearchChanged"/>
-
-          <div class="content-file--items">
-        <div class="content-file--item empty" v-if="files.length === 0">
-          <span v-if="search !== ''">No results. Try other file name.</span>
-          <span v-else>List of files that you upload will appear here.</span>
+  <section class="h-full w-full overflow-hidden bg-background">
+    <Card class="h-full w-full border-none">
+      <CardContent class="h-full w-full flex flex-col p-4">
+        <!-- Search Input -->
+        <div class="flex-none w-full">
+          <SearchInput 
+            :search="search" 
+            :count="files.length" 
+            @on-changed="onSearchChanged"
+          />
         </div>
 
-        <div class="content-file--item" v-for="(item, index) in files" :key="index">
-          <div class="item-content">
-            <div class="item-icon">
-              <i-ri-file-list-3-line class="icon-color" />
-            </div>
-            <div class="item-detail">
-              <span class="item-detail--title" :title="item.Name">{{ item.Name }}</span>
-              <span class="item-detail--subtitle">{{ item.Size }} • txt</span>
-            </div>
-            <div class="item-action">
-              <a v-if="!!item.Hash" title="Open Shorten Link" target="_blank" :href="`http://123.157.213.102:39760/ipfs/${item.Hash}`" rel="noopener">
-                <i-ri-link-unlink-m class="icon-color" />
-              </a>
-              <!-- <a v-else title="Generate Shorten Link" @click="shortenLink(item)">
-                <i-ri-link-m class="icon-color" />
-              </a> -->
-
-              <a title="Open Link" :href="`http://123.157.213.102:39760/ipfs/${item.Hash}`">
-                <i-ri-external-link-fill class="icon-color" />
-              </a>
-            </div>
+        <!-- File List -->
+        <ScrollArea class="flex-1 w-full mt-4">
+          <!-- Empty State -->
+          <div v-if="files.length === 0" class="flex flex-col items-center justify-center p-8">
+            <FileIcon class="h-12 w-12 text-muted-foreground" />
+            <h3 class="mt-4 text-lg font-semibold">No files found</h3>
+            <p class="text-sm text-muted-foreground">
+              {{ search ? 'Try a different search term' : 'Upload files to get started' }}
+            </p>
           </div>
-          <div class="item-cid">
-            <!-- <label>
-              <input class="input-cid" type="text" readonly @focus="$event.target.select()" :value="generateLink(item)" />
-            </label> -->
 
-            <a title="Copy to clipboard" @click="copyFileLink(item)">
-              <i-ri-clipboard-line class="icon-color" />
-            </a>
+          <!-- File Items -->
+          <div v-else class="space-y-2 w-full">
+            <Card v-for="(item, index) in files" 
+                  :key="item.cid || index"
+                  class="w-full hover:bg-accent transition-colors">
+                  <CardContent class="p-4">
+                <!-- File Info Container -->
+                <div class="w-full flex flex-col">
+                  <!-- Top Row with Icon, Name, and Actions -->
+                  <div class="flex items-center gap-4 w-full">
+                    <!-- File Icon -->
+                    <div class="flex-none flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                      <FileText class="h-5 w-5 text-primary" />
+                    </div>
+
+                    <!-- File Details -->
+                    <div class="flex-1 min-w-0 max-w-[200px] overflow-hidden">
+                      <TooltipProvider>
+                        <Tooltip :delay-duration="300">
+                          <TooltipTrigger asChild>
+                            <h4 class="font-medium truncate cursor-default">
+                              {{ item.name || 'Unnamed File' }}
+                            </h4>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {{ item.name || 'Unnamed File' }}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <p class="text-sm text-muted-foreground truncate">
+                        {{ formatFileSize(item.size) }}
+                      </p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex-none flex gap-2">
+                      <Button v-if="item.cid" 
+                              variant="ghost" 
+                              size="icon"
+                              @click.prevent="openLink(getIpfsUrl(item.cid))"
+                              title="Open in new tab"
+                              class="h-8 w-8">
+                        <ExternalLink class="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" 
+                              size="icon"
+                              @click.prevent="copyFileLink(item)"
+                              title="Copy link"
+                              class="h-8 w-8">
+                        <Clipboard class="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <!-- CID Display -->
+                  <div v-if="item.cid" class="mt-3 w-full">
+                    <div class="w-full relative">
+                      <Input 
+                        :model-value="getIpfsUrl(item.cid)"
+                        readonly
+                        class="text-sm font-mono bg-muted w-full overflow-hidden text-ellipsis"
+                        @focus="$event.target.select()"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </div>
-      </div>
-        </div>
-    </section>
+        </ScrollArea>
+      </CardContent>
+    </Card>
+  </section>
 </template>
 
 <script setup lang="ts">
-import SearchInput from '../Input/SearchInput.vue';
+import { ref, computed } from 'vue'
+import useLocalStorage from '@/store/localStorageDB'
+import type { FileItem } from '@/lib/ipfs-client/dango-ipfs-ts/types/dango.type'
+import { Card, CardContent} from '@/components/ui/card'
+import Input from '@/components/ui/input/Input.vue'
+import ScrollArea from '@/components/ui/scroll-area/ScrollArea.vue'
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip'
+import Button from '@/components/ui/button/Button.vue'
+import SearchInput from '../Input/SearchInput.vue'
+import { 
+  FileIcon,
+  FileText,
+  ExternalLink,
+  Clipboard
+} from 'lucide-vue-next'
+import { useToast } from '@/components/ui/toast'
+import { it } from 'node:test'
 
-import { ref, computed } from 'vue';
-import useLocalStorage from '@/store/localStorageDB';
-import type { IpfsResponseDataObject } from '@/lib/ipfs-client/ipfsClient.type';
+const { toast } = useToast()
+const IPFS_GATEWAY = 'http://10.130.144.181:18080/ipfs'
+const localStore = useLocalStorage()
+const search = ref('')
 
-const localStore = useLocalStorage();
-const search = ref<string>('');
-
-const onSearchChanged = (event:Event) => {
-  search.value = (event.target as HTMLInputElement).value;
+const onSearchChanged = (event: Event): void => {
+  if (event.target instanceof HTMLInputElement) {
+    search.value = event.target.value.trim()
+  }
 }
 
-const files = computed(() => localStore
-  .results.slice()
+const files = computed<FileItem[]>(() => localStore
+  .results
+  .slice()
   .reverse()
-  .filter(file => !!file.Hash)
+  .filter((file): file is FileItem & { cid: string } => !!file.cid)
   .filter(file => {
-    if (search.value === '')  return true;
-    return file.Name.indexOf(search.value) >= 0;
+    if (!search.value) return true
+    return file.name.toLowerCase().includes(search.value.toLowerCase())
   })
 )
 
-
-const copyFileLink = (item: IpfsResponseDataObject) => {
-  console.log(item.Hash)
+const formatFileSize = (bytes: string): string => {
+  const byteValue = Number(bytes)
+  if (isNaN(byteValue) || byteValue === 0) return '0 Bytes'
+  
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(byteValue) / Math.log(k))
+  
+  return `${parseFloat((byteValue / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
 }
 
+const getIpfsUrl = (cid: string): string => {
+  return `${IPFS_GATEWAY}/${cid}`
+}
 
+const copyFileLink = async (item: FileItem): Promise<void> => {
+  if (!item.cid) return
+  
+  try {
+    await navigator.clipboard.writeText(getIpfsUrl(item.cid))
+    toast({
+      title: "Link copied",
+      description: "File link has been copied to clipboard",
+      duration: 2000
+    })
+  } catch (error) {
+    console.error('Failed to copy:', error)
+    toast({
+      title: "Copy failed",
+      description: "Failed to copy link to clipboard",
+      variant: "destructive"
+    })
+  }
+}
 
-
+const openLink = (url: string): void => {
+  try {
+    window.open(url, '_blank', 'noopener,noreferrer')
+  } catch (error) {
+    console.error('Failed to open link:', error)
+    toast({
+      title: "Error",
+      description: "Failed to open link in new tab",
+      variant: "destructive"
+    })
+  }
+}
 </script>
-
-<style lang="scss">
-section#panel-result {
-  background-color: #ffffff;
-  border-top-right-radius: 1rem;
-  border-bottom-right-radius: 1rem;
-  border-left: 1px solid rgba(0, 0, 0, .05);
-
-  .panel-result--content {
-    padding: 0.8rem;
-    height: calc(100% - 1.6rem);
-
-    .content-file--items {
-      display: flex;
-      flex-direction: column;
-
-      overflow-y: scroll;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(0, 0, 0, .4) rgba(36, 18, 18, 0.2);
-
-      height: calc(100% - 2.95rem);
-
-      &::-webkit-scrollbar {
-        width: 0.3rem;
-      }
-      &::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 1rem;
-      }
-      &::-webkit-scrollbar-thumb {
-        background-color: rgba(0, 0, 0, 0.6);
-        border-radius: 1rem;
-      }
-
-      .content-file--item {
-        width: calc(100% - 1.6rem);
-        padding: 0.8rem;
-        margin-bottom: 0.8rem;
-        display: flex;
-        flex-direction: column;
-
-        border-radius: 1rem;
-        background-color: rgba(0, 0, 0, .05);
-
-        &.empty {
-          font-size: 0.7rem;
-          text-align: center;
-          border-radius: 0.8rem;
-        }
-
-        a svg {
-          cursor: pointer;
-        }
-
-        .item-content {
-          width: 100%;
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-
-          .item-icon {
-            padding: 0.5rem 0.5rem 0.5rem 0;
-          }
-          .item-detail {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-
-            .item-detail--title {
-              font-size: 0.7rem;
-              width: 220px;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-
-              margin-bottom: 0.4rem;
-            }
-            .item-detail--subtitle {
-              font-size: 0.7rem;
-            }
-          }
-          .item-action {
-            display: flex;
-            align-items: center;
-            padding: 0.5rem 0 0.5rem 0.5rem;
-
-            a {
-              &:not(:last-child) {
-                margin-right: 0.5rem;
-              }
-            }
-          }
-        }
-
-        .item-cid {
-          display: flex;
-          align-items: center;
-          margin-top: 0.7rem;
-          width: 100%;
-
-          label {
-            display: flex;
-            flex: 1;
-
-            .input-cid {
-              flex: 1;
-              background-color: rgba(0, 0, 0, 0.1);
-              outline: none;
-              border: none;
-              color: var(--contrast-color);
-              padding: 8px;
-              border-radius: 0.5rem;
-              font-size: 0.7rem;
-            }
-          }
-          a {
-            margin-left: 0.5rem;
-          }
-        }
-      }
-    }
-  }
-}
-
-body.dark-theme {
-  section#panel-result {
-    background-color: var(--gradient-900);
-
-    .content-file--items .content-file--item {
-      background-color: rgba(255, 255, 255, .05);
-
-      .item-detail--subtitle {
-        color: rgba(255, 255, 255, 0.5);
-      }
-      .item-cid .input-cid {
-        color: rgba(255, 255, 255, 0.8);
-      }
-    }
-  }
-}
-</style>

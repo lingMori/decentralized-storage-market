@@ -1,8 +1,7 @@
 import { defineStore } from "pinia";
 import Storage from "@/lib/local-storage/storage";
 import { ref } from "vue";
-import type { IpfsResponseData, IpfsResponseDataObject } from "@/lib/ipfs-client/ipfsClient.type";
-
+import type { FileItem } from "@/lib/ipfs-client/dango-ipfs-ts/types/dango.type";
 
 const localStorageDB = new Storage("storageApp");
 
@@ -12,7 +11,7 @@ localStorageDB.data ||= { version:"0.0.1", results: []}
 
 const useLocalStorage = defineStore('store',() => {
     const files = ref<File[]>([])
-    const results = ref<IpfsResponseDataObject[]>(localStorageDB.data.results)
+    const results = ref<FileItem[]>(localStorageDB.data.results)
 
     const resetFiles = () => {
         files.value = []
@@ -21,15 +20,15 @@ const useLocalStorage = defineStore('store',() => {
         files.value.push(...newFiles);
     }
 
-    const isIpfsResponseDataObject = (data: IpfsResponseData): data is IpfsResponseDataObject => {
-        return (data as IpfsResponseDataObject).Hash !== undefined;
+    const isIpfsResponseDataObject = (data: FileItem): data is FileItem => {
+        return (data as FileItem).cid !== undefined;
       };
 
-    const addResults = (newResults:IpfsResponseData[]) => {
+    const addResults = (newResults:FileItem[]) => {
         // results.value.push(...newResults);
-        const filteredResults = newResults.filter((newResult) :newResult is IpfsResponseDataObject => 
+        const filteredResults = newResults.filter((newResult) :newResult is FileItem => 
             isIpfsResponseDataObject(newResult) &&
-            !results.value.some((existingResult) => existingResult.Hash === newResult.Hash)
+            !results.value.some((existingResult) => existingResult.cid === newResult.cid)
         );
         results.value.push(...filteredResults)
         localStorageDB.data.results = [...results.value];

@@ -16,16 +16,13 @@ dataSources:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - FileRemoved
-        - FileStatusUpdated
-        - FileUploaded
-        - FreeLoadUpdated
-        - InstanceLockStatusUpdated
-        - InstanceOwnerRegistered
-        - MaxLoadUpdated
-        - OwnershipTransferred
-        - Paused
-        - Unpaused
+        - User
+        - File
+        - FileStatus
+        - SystemConfig
+        - FileHistory
+        - UserHistory
+        - Statistics
       abis:
         - name: InstaShare
           file: ./abis/InstaShare.json
@@ -44,10 +41,4 @@ dataSources:
           handler: handleInstanceOwnerRegistered
         - event: MaxLoadUpdated(uint256,address)
           handler: handleMaxLoadUpdated
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-        - event: Paused(address)
-          handler: handlePaused
-        - event: Unpaused(address)
-          handler: handleUnpaused
       file: ./src/insta-share.ts

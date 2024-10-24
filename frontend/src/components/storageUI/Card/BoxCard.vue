@@ -48,15 +48,7 @@ import Badge from '@/components/ui/badge/Badge.vue'
 import Button from '@/components/ui/button/Button.vue'
 import ScrollArea from '@/components/ui/scroll-area/ScrollArea.vue'
 import { onMounted, ref } from 'vue'
-
-interface FileItem {
-    name: string
-    cid: string
-    status: 'active' | 'pending' | 'archived' | 'false'
-    lastModified: string
-    size: string
-    type: string
-}
+import type { FileItem } from '@/lib/ipfs-client/dango-ipfs-ts/types/dango.type'
 
 const files = ref<FileItem[]>([])
 
