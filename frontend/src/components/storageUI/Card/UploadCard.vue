@@ -21,12 +21,21 @@
 
                     <div class="dropzone-details">
                     <div class="dropzone-detail">{{ result.count }} files</div>
-                    <div class="dropzone-detail">{{ result.size }}</div>
+                    <div class="dropzone-detail">{{ formatFileSize(String(result.size)) }}</div>
                     </div>
                 </div>
         </div>
-        
     </section>
+    <Teleport to="body">
+    <Dialog :open="!hasRegisted" @update:open="(val) => hasRegisted = !val">
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>这是一个弹窗测试</DialogTitle>
+          <DialogClose @click="closeDialog" />
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
@@ -42,15 +51,22 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog';
+import { formatFileSize } from '@/lib/data-tools/dataFormer';
+import { Teleport } from 'vue';
 import type { FileItem } from '@/lib/ipfs-client/dango-ipfs-ts/types/dango.type';
 
 const localStore = useLocalStorage();
 
-const hasRegisted = ref<boolean>(false);
 const isDragged = ref<boolean>(false);
 const isUploading = ref<boolean>(false);
 const isUploaded = ref<boolean>(false);
 const finished = ref<number>(0);
+
+const hasRegisted = ref(false)
+
+const closeDialog = () => {
+  hasRegisted.value = false
+}
 
 const fileRef = ref<HTMLInputElement | null>(null);
 const fileCount = computed(() => {

@@ -34,6 +34,7 @@ const toggleTheme = () => {
   requestAnimationFrame(toggleAnimation)
 
   isDark.value = !isDark.value
+  localStorage.setItem("theme", isDark.value ? "dark" : "light")
   isDark.value ? document.body.classList.add("dark") : document.body.classList.remove("dark")
 }
 

@@ -23,7 +23,7 @@
           </div>
 
           <!-- File Items -->
-          <div v-else class="space-y-2 w-full">
+          <div v-else class="space-y-2 w-full pr-3">
             <Card v-for="(item, index) in files" 
                   :key="item.cid || index"
                   class="w-full hover:bg-accent transition-colors">
@@ -114,10 +114,10 @@ import {
   Clipboard
 } from 'lucide-vue-next'
 import { useToast } from '@/components/ui/toast'
-import { it } from 'node:test'
+import { formatFileSize } from '@/lib/data-tools/dataFormer'
+import { IPFS_GATEWAY } from '@/configs/IPFS_GATEWAY'
 
 const { toast } = useToast()
-const IPFS_GATEWAY = 'http://10.130.144.181:18080/ipfs'
 const localStore = useLocalStorage()
 const search = ref('')
 
@@ -137,17 +137,6 @@ const files = computed<FileItem[]>(() => localStore
     return file.name.toLowerCase().includes(search.value.toLowerCase())
   })
 )
-
-const formatFileSize = (bytes: string): string => {
-  const byteValue = Number(bytes)
-  if (isNaN(byteValue) || byteValue === 0) return '0 Bytes'
-  
-  const k = 1024
-  const sizes = ['Bytes', 'KB', 'MB', 'GB']
-  const i = Math.floor(Math.log(byteValue) / Math.log(k))
-  
-  return `${parseFloat((byteValue / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
-}
 
 const getIpfsUrl = (cid: string): string => {
   return `${IPFS_GATEWAY}/${cid}`

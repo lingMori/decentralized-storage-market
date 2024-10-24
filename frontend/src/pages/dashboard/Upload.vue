@@ -1,5 +1,6 @@
 <template>
-  <BackCard>
+  <!-- <Button @click="clearCache">clear cache</Button> -->
+  <BackCard :style="{ height: `calc(100vh - ${headerHeight}px)` }">
     <UploadCard></UploadCard>
     <SearchCard></SearchCard>
   </BackCard>
@@ -9,6 +10,26 @@
   import UploadCard from '@/components/storageUI/Card/UploadCard.vue';
   import BackCard from '@/components/storageUI/Card/BackCard.vue';
   import SearchCard from '@/components/storageUI/Card/SearchCard.vue';
+
+  import { onMounted, ref, onUnmounted } from 'vue';
+
+  const headerHeight = ref(0)
+
+  const updateHeaderHeight = () => {
+    const header = document.querySelector('header')
+    if (header) {
+      headerHeight.value = header.offsetHeight
+    }
+  }
+
+  onMounted(() => {
+    updateHeaderHeight()
+    window.addEventListener('resize', updateHeaderHeight)
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', updateHeaderHeight)
+  })
   
   </script>
   
