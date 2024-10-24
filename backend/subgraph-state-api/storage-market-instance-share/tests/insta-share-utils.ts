@@ -7,10 +7,11 @@ import {
   FreeLoadUpdated,
   InstanceLockStatusUpdated,
   InstanceOwnerRegistered,
+  MaxLoadUpdated,
   OwnershipTransferred,
   Paused,
   Unpaused
-} from "../generated/InstaShre/InstaShre"
+} from "../generated/InstaShare/InstaShare"
 
 export function createFileRemovedEvent(
   owner: Address,
@@ -154,6 +155,30 @@ export function createInstanceOwnerRegisteredEvent(
   )
 
   return instanceOwnerRegisteredEvent
+}
+
+export function createMaxLoadUpdatedEvent(
+  newMaxLoad: BigInt,
+  ownerAddress: Address
+): MaxLoadUpdated {
+  let maxLoadUpdatedEvent = changetype<MaxLoadUpdated>(newMockEvent())
+
+  maxLoadUpdatedEvent.parameters = new Array()
+
+  maxLoadUpdatedEvent.parameters.push(
+    new ethereum.EventParam(
+      "newMaxLoad",
+      ethereum.Value.fromUnsignedBigInt(newMaxLoad)
+    )
+  )
+  maxLoadUpdatedEvent.parameters.push(
+    new ethereum.EventParam(
+      "ownerAddress",
+      ethereum.Value.fromAddress(ownerAddress)
+    )
+  )
+
+  return maxLoadUpdatedEvent
 }
 
 export function createOwnershipTransferredEvent(

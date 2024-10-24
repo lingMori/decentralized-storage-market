@@ -8,9 +8,9 @@ import {
 } from "matchstick-as/assembly/index"
 import { Address, BigInt } from "@graphprotocol/graph-ts"
 import { FileRemoved } from "../generated/schema"
-import { FileRemoved as FileRemovedEvent } from "../generated/InstaShre/InstaShre"
-import { handleFileRemoved } from "../src/insta-shre"
-import { createFileRemovedEvent } from "./insta-shre-utils"
+import { FileRemoved as FileRemovedEvent } from "../generated/InstaShare/InstaShare"
+import { handleFileRemoved } from "../src/insta-share"
+import { createFileRemovedEvent } from "./insta-share-utils"
 
 // Tests structure (matchstick-as >=0.5.0)
 // https://thegraph.com/docs/en/developer/matchstick/#tests-structure-0-5-0

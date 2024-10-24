@@ -5,10 +5,11 @@ import {
   FreeLoadUpdated as FreeLoadUpdatedEvent,
   InstanceLockStatusUpdated as InstanceLockStatusUpdatedEvent,
   InstanceOwnerRegistered as InstanceOwnerRegisteredEvent,
+  MaxLoadUpdated as MaxLoadUpdatedEvent,
   OwnershipTransferred as OwnershipTransferredEvent,
   Paused as PausedEvent,
   Unpaused as UnpausedEvent
-} from "../generated/InstaShre/InstaShre"
+} from "../generated/InstaShare/InstaShare"
 import {
   FileRemoved,
   FileStatusUpdated,
@@ -16,6 +17,7 @@ import {
   FreeLoadUpdated,
   InstanceLockStatusUpdated,
   InstanceOwnerRegistered,
+  MaxLoadUpdated,
   OwnershipTransferred,
   Paused,
   Unpaused
@@ -106,6 +108,20 @@ export function handleInstanceOwnerRegistered(
   entity.ownerAddress = event.params.ownerAddress
   entity.freeLoad = event.params.freeLoad
   entity.isLocked = event.params.isLocked
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
+
+export function handleMaxLoadUpdated(event: MaxLoadUpdatedEvent): void {
+  let entity = new MaxLoadUpdated(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
+  )
+  entity.newMaxLoad = event.params.newMaxLoad
+  entity.ownerAddress = event.params.ownerAddress
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp

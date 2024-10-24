@@ -5,12 +5,12 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: InstaShre
+    name: InstaShare
     network: sepolia
     source:
-      address: "0x034900Ea4dCFbed658cE74175520f08d5b952A66"
-      abi: InstaShre
-      startBlock: 6929014
+      address: "0x98ac19027805FBD0cE2e42f4AF3A32F3e9ACC5bD"
+      abi: InstaShare
+      startBlock: 6934192
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -22,12 +22,13 @@ dataSources:
         - FreeLoadUpdated
         - InstanceLockStatusUpdated
         - InstanceOwnerRegistered
+        - MaxLoadUpdated
         - OwnershipTransferred
         - Paused
         - Unpaused
       abis:
-        - name: InstaShre
-          file: ./abis/InstaShre.json
+        - name: InstaShare
+          file: ./abis/InstaShare.json
       eventHandlers:
         - event: FileRemoved(address,string)
           handler: handleFileRemoved
@@ -41,10 +42,12 @@ dataSources:
           handler: handleInstanceLockStatusUpdated
         - event: InstanceOwnerRegistered(address,uint256,bool)
           handler: handleInstanceOwnerRegistered
+        - event: MaxLoadUpdated(uint256,address)
+          handler: handleMaxLoadUpdated
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
         - event: Paused(address)
           handler: handlePaused
         - event: Unpaused(address)
           handler: handleUnpaused
-      file: ./src/insta-shre.ts
+      file: ./src/insta-share.ts

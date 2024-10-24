@@ -37,6 +37,7 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
     event FileStatusUpdated(address owner, string cid, bool isActive);
     event FileRemoved(address owner, string cid);
     event InstanceLockStatusUpdated(address owner, bool isLocked);
+    event MaxLoadUpdated(uint256 newMaxLoad, address ownerAddress);
 
     // Errors
     error AlreadyRegistered();
@@ -164,16 +165,18 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
     }
 
     // Admin functions
-    function updateFreeLoad(uint256 newFreeload, address ownerAddress) public onlyOwner {
+    function updateMaxLoad(uint256 newMaxLoad, address ownerAddress) public onlyOwner {
         if (instanceOwners[ownerAddress].ownerAddress != ownerAddress) {
             revert NotRegistered();
         }
 
         uint256 usedLoad = instanceOwners[ownerAddress].maxLoad - instanceOwners[ownerAddress].freeLoad;
         
-        instanceOwners[ownerAddress].freeLoad = newFreeload - usedLoad;
-        instanceOwners[ownerAddress].maxLoad = newFreeload;
-        emit FreeLoadUpdated(ownerAddress, newFreeload);
+        instanceOwners[ownerAddress].freeLoad = newMaxLoad - usedLoad;
+        instanceOwners[ownerAddress].maxLoad = newMaxLoad;
+        // emit FreeLoadUpdated(ownerAddress, newMaxLoad);
+        // add maxload update event
+        emit MaxLoadUpdated(newMaxLoad, ownerAddress);
     }
 
     function setInstanceLock(address ownerAddress, bool locked) public onlyOwner {

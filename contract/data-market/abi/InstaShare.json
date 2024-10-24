@@ -235,6 +235,25 @@
 		"anonymous": false,
 		"inputs": [
 			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "newMaxLoad",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "ownerAddress",
+				"type": "address"
+			}
+		],
+		"name": "MaxLoadUpdated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
 				"indexed": true,
 				"internalType": "address",
 				"name": "previousOwner",
@@ -539,7 +558,7 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "newFreeload",
+				"name": "newMaxLoad",
 				"type": "uint256"
 			},
 			{
@@ -548,7 +567,7 @@
 				"type": "address"
 			}
 		],
-		"name": "updateFreeLoad",
+		"name": "updateMaxLoad",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"

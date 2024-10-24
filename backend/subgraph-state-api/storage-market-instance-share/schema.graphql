@@ -57,6 +57,15 @@ type InstanceOwnerRegistered @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
+type MaxLoadUpdated @entity(immutable: true) {
+  id: Bytes!
+  newMaxLoad: BigInt! # uint256
+  ownerAddress: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
 type OwnershipTransferred @entity(immutable: true) {
   id: Bytes!
   previousOwner: Bytes! # address
