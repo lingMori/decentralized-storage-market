@@ -26,49 +26,132 @@
                 </div>
         </div>
     </section>
-    <Teleport to="body">
-    <Dialog :open="!hasRegisted" @update:open="(val) => hasRegisted = !val">
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>这是一个弹窗测试</DialogTitle>
-          <DialogClose @click="closeDialog" />
-        </DialogHeader>
+    <Dialog :open="!hasLogin" @update:open="(val) => hasLogin = !val">
+      <DialogContent v-on:interact-outside="(e: Event) => {e.preventDefault()}">
+        <Card class="w-full max-w-md mx-auto border-0 shadow-none">
+          <CardHeader>
+            <CardTitle class="text-2xl font-bold text-center">欢迎来到 InstaShare</CardTitle>
+            <CardDescription class="text-center">
+              请选择您喜欢的登录方式继续
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs default-value="wallet" class="w-full">
+              <TabsList class="grid w-full grid-cols-2">
+                <TabsTrigger value="wallet">Web3 钱包</TabsTrigger>
+                <TabsTrigger value="social">社交账号</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="wallet" class="space-y-4">
+                <div class="grid gap-4 mt-4">
+                  <Button class="w-full h-12  bg-orange-600  hover:bg-orange-600  text-white border-none transition-all duration-300 group relative overflow-hidden" 
+                          variant="outline" 
+                          @click="connectWallet">
+                    <Wallet class="mr-2 h-5 w-5" />
+                    连接 MetaMask
+                  </Button>
+                  <Button class="w-full h-12" variant="outline" >
+                    <Globe class="mr-2 h-5 w-5" />
+                    连接 WalletConnect
+                  </Button>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="social" class="space-y-4">
+                <div class="grid gap-4 mt-4">
+                  <Button class="w-full h-12" variant="outline" >
+                    <Mail class="mr-2 h-5 w-5" />
+                    邮箱登录
+                  </Button>
+                  <Button class="w-full h-12" variant="outline" >
+                    <Globe class="mr-2 h-5 w-5" />
+                    Google 登录
+                  </Button>
+                  <Button class="w-full h-12" variant="outline" >
+                    <Laptop class="mr-2 h-5 w-5" />
+                    Apple 登录
+                  </Button>
+                  <Button class="w-full h-12" variant="outline">
+                    <GithubIcon class="mr-2 h-5 w-5" />
+                    Github 登录
+                  </Button>
+                </div>
+              </TabsContent>
+            </Tabs>
+
+            <div class="relative my-4">
+              <div class="absolute inset-0 flex items-center">
+                <Separator class="w-full" />
+              </div>
+              <div class="relative flex justify-center text-xs uppercase">
+                <span class="bg-background px-2 text-muted-foreground">
+                  或者
+                </span>
+              </div>
+            </div>
+
+            <Button 
+              class="w-full " 
+              variant="default"
+              @click="registeInsta"
+            >
+              现在加入InstaShre网络
+            </Button>
+          </CardContent>
+  </Card>
       </DialogContent>
     </Dialog>
-  </Teleport>
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref } from 'vue';
-import useLocalStorage from '@/store/localStorageDB';
-import type { AddResult, KuboRPCClient } from 'kubo-rpc-client';
+import { computed, inject, onMounted, ref } from 'vue';
 import { 
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
 } from '@/components/ui/dialog';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
+import Button from '@/components/ui/button/Button.vue';
+import {
+  Wallet,
+  Mail,
+  Github as GithubIcon,
+  Globe,
+  Laptop
+} from 'lucide-vue-next'
+
+import useLocalStorage from '@/store/localStorageDB';
+import type { AddResult, KuboRPCClient } from 'kubo-rpc-client';
 import { formatFileSize } from '@/lib/data-tools/dataFormer';
-import { Teleport } from 'vue';
 import type { FileItem } from '@/lib/ipfs-client/dango-ipfs-ts/types/dango.type';
+import { useWeb3ModalAccount, useWeb3Modal } from '@web3modal/ethers5/vue';
+import { useInstaShareContract } from '@/lib/contract-interact/useContract';
+import { accountRepo } from '@/lib/contract-interact/accountRepp';
+
 
 const localStore = useLocalStorage();
+const {isConnected} = useWeb3ModalAccount();
+const {open, close} = useWeb3Modal();
+
+const {getSigner} = useInstaShareContract();
+const {register, checkRegistrationStatus} = accountRepo();
+
 
 const isDragged = ref<boolean>(false);
 const isUploading = ref<boolean>(false);
 const isUploaded = ref<boolean>(false);
 const finished = ref<number>(0);
-
-const hasRegisted = ref(false)
-
-const closeDialog = () => {
-  hasRegisted.value = false
-}
-
+const hasRegisted = ref<boolean>(true)
+const hasLogin = ref<boolean>(true);
 const fileRef = ref<HTMLInputElement | null>(null);
+const ipfsClient = inject('dangoRPC') as KuboRPCClient;
+
+onMounted(async () => {
+  hasLogin.value = checkLogin()
+  hasRegisted.value = await checkRegister()
+})
+
+
 const fileCount = computed(() => {
   return localStore.files.length;
 })
@@ -82,57 +165,99 @@ const result = computed(() => {
   }
 })
 
-const ipfsClient = inject('dangoRPC') as KuboRPCClient;
-
-const onDragEnter = () => {
-    isDragged.value = true;
-}
-
-const onDragLeave = () => {
-    isDragged.value = false;
-}
-
-const openSelectFile = () => {
-      if (isUploading.value) return false;
-
-      fileRef.value?.click()
-}
+const onDragEnter = () => {isDragged.value = true;}
+const onDragLeave = () => {isDragged.value = false;}
+const openSelectFile = () => {if (isUploading.value) return false; fileRef.value?.click()}
 
 const onDropHandler = (event:DragEvent) => {
     isDragged.value = false;
     if (event.dataTransfer?.files) {
-        const files:FileList = event.dataTransfer.files;
-        console.log(files);
+      const files: FileList = event.dataTransfer.files;
+        localStore.addFiles(files);
+        onFileChangeHandler(); // Trigger file change handler
     }
 }
 
-const uploadFileHandler = async(file:File):Promise<FileItem> => {
+const uploadFileHandler = async (file: File): Promise<FileItem> => {
+    try {
+        const response: AddResult = await ipfsClient.add(file);
+        return {
+            name: file.name,
+            cid: response.cid.toString(),
+            status: 'active',
+            lastModified: file.lastModified.toString(),
+            size: file.size.toString(),
+            type: file.type
+        } as FileItem;
+    } catch (error) {
+        console.log('upload file error', error);
+        return {} as FileItem; // Return empty object if error occurs
+    } finally {
+        finished.value++;
+    }
+};
+
+const checkLogin = ():boolean => {
   try {
-    const response:AddResult = await ipfsClient.add(file);
-    const filePackage:FileItem = {
-      name: file.name,
-      cid: response.cid.toString(),
-      status: 'active',
-      lastModified: file.lastModified.toString(),  // Use `file.lastModified`
-      size: file.size.toString(),                 // Use `file.size`
-      type: file.type                             // Use `file.type`
-    } as FileItem
+    
+    const status:boolean = isConnected.value? true: false;
+    return status
 
-    return filePackage;
-
-  } catch (error) {
-    console.log('upload file error', error);
+  }catch (error) {
+    console.log('register configration error: ', error)
   }
-
-  finished.value++;
-  return {} as FileItem;  // Return empty object if error occurs
+  return false
 }
 
+const checkRegister = async ():Promise<boolean> => {
+
+  try{
+    const address = await getSigner().getAddress()
+    const {isRegistered} = await checkRegistrationStatus(address)
+
+    return isRegistered;
+
+  }catch (error) {
+    console.log('register configration error: ', error)
+  }
+  return false; // Ensure a boolean is always returned
+}
+
+const connectWallet = async () => {
+  await open(); // 等待 open 完成
+  while (!isConnected.value) {
+      console.log("waiting for connect");
+      await new Promise(resolve => setTimeout(resolve, 1000)); // 等待 0.5 秒
+  }
+};
+
+const registeInsta = async () => {
+  try {
+    if (!checkLogin()) {
+      await connectWallet(); // 直接等待连接完成
+      const signer = getSigner();
+      const address = await signer.getAddress();
+      const response = await register();
+      console.log(response);
+    }
+  } catch (error) {
+    console.log("registration error: ", error); // 更具体的错误信息
+  }
+};
+
+
 const onFileChangeHandler = async() => {
+  
     isUploading.value = true;
     // const uploadFileHander:Promise<IpfsUploadResult>[] = [];
     
     if (fileRef.value?.files) {
+        if (!checkLogin()) {
+          hasLogin.value = false
+          fileRef.value.value = ""
+          isUploading.value = false;
+          return;
+        }
         const files:FileList = fileRef.value?.files;
         localStore.addFiles(files);
     
@@ -150,7 +275,8 @@ const onFileChangeHandler = async() => {
         }finally {
           finished.value = 0;
           isUploading.value = false;
-          console.log(localStorage.getItem("storageApp"))
+          fileRef.value.value = ""
+          // console.log(localStorage.getItem("storageApp"))
           // localStore.clearCache();
         }
     }
