@@ -30,7 +30,7 @@ storageApp.use(dangoIPFS, [
 ]);
 
 if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    document.body.classList.add("dark-theme");
+    // document.body.classList.add("dark-theme");
 }
 
 storageApp.mount('#app')
