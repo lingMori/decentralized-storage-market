@@ -17,7 +17,7 @@
                     <Button 
                         variant="ghost" 
                         class="nav-item"
-                        :class="{ active: currentPath === 'all' }"
+                        :class="{ active: currentView === 'all' }"
                         @click="handleNavigation('all')"
                     >
                         <FolderIcon class="nav-icon" />
@@ -26,7 +26,7 @@
                     <Button 
                         variant="ghost" 
                         class="nav-item"
-                        :class="{ active: currentPath === 'recent' }"
+                        :class="{ active: currentView === 'recent' }"
                         @click="handleNavigation('recent')"
                     >
                         <ClockIcon class="nav-icon" />
@@ -35,7 +35,7 @@
                     <Button 
                         variant="ghost" 
                         class="nav-item"
-                        :class="{ active: currentPath === 'starred' }"
+                        :class="{ active: currentView === 'starred' }"
                         @click="handleNavigation('starred')"
                     >
                         <StarIcon class="nav-icon" />
@@ -52,8 +52,8 @@
                         :key="type.id"
                         variant="ghost" 
                         class="nav-item"
-                        :class="{ active: currentType === type.id }"
-                        @click="handleTypeFilter(type.id)"
+                        :class="{ active: currentView === type.id }"
+                        @click="handleNavigation(type.id)"
                     >
                         <component :is="type.icon" class="nav-icon" />
                         {{ type.name }}
@@ -86,8 +86,7 @@ import {
     SettingsIcon 
 } from 'lucide-vue-next'
 
-const currentPath = ref('all')
-const currentType = ref('')
+const currentView = ref('all')
 const isLoading = ref(true)
 
 const usedStorage = ref(0) // GB
@@ -104,14 +103,9 @@ const formatStorage = (size: number) => {
     return `${size}GB`
 }
 
-const handleNavigation = (path: string) => {
-    currentPath.value = path
+const handleNavigation = (view: string) => {
+    currentView.value = view
     // 触发路由或状态更新
-}
-
-const handleTypeFilter = (type: string) => {
-    currentType.value = type
-    // 触发文件类型筛选
 }
 
 const getUsedStorage = async():Promise<number> => {

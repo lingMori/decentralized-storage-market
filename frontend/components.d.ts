@@ -55,6 +55,7 @@ declare module 'vue' {
     IRiLinkM: typeof import('~icons/ri/link-m')['default']
     IRiLinkUnlinkM: typeof import('~icons/ri/link-unlink-m')['default']
     Progress: typeof import('./src/components/ui/progress/Progress.vue')['default']
+    RegisterDialog: typeof import('./src/components/storageUI/Dialog/RegisterDialog.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ScrollArea: typeof import('./src/components/ui/scroll-area/ScrollArea.vue')['default']

@@ -53,9 +53,10 @@
                         <td class="file-td">
                             <span class="file-cid">{{ file.cid }}</span>
                         </td>
+                        <!-- justify center when showFile status is false -->
                         <td class="file-td">
-                            <Badge :variant="getStatusVariant(file.status)" class="status-badge">
-                                {{ getStatusText(file.status) }}
+                            <Badge :variant="getStatusVariant(file.status)" class="status-badge" :isDot="!showFileStatus">
+                                {{ showFileStatus?getStatusText(file.status):'' }}
                             </Badge>
                         </td>
                         <td class="file-td">{{ file.lastModified }}</td>
@@ -89,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { MoreHorizontal } from 'lucide-vue-next'
 import Card from '@/components/ui/card/Card.vue'
 import Badge from '@/components/ui/badge/Badge.vue'
@@ -107,11 +108,12 @@ import type { FileItem } from '@/lib/ipfs-client/dango-ipfs-ts/types/dango.type'
 
 const files = ref<FileItem[]>([])
 const selectedFiles = ref<FileItem[]>([])
+const showFileStatus = ref<boolean>(false)
 
 const FileType: string[] = [
     "image",
     "mp4",
-    "video_extranct"
+    "video"
 ]
 
 // 计算全选状态
@@ -123,19 +125,6 @@ const selectAll = computed(() => {
 const indeterminate = computed(() => {
     return selectedFiles.value.length > 0 && selectedFiles.value.length < files.value.length
 })
-
-// const getStatusVariant = (status: string) => {
-//     switch (status) {
-//         case 'active':
-//             return 'success'
-//         case 'pending':
-//             return 'warning'
-//         case 'archived':
-//             return 'secondary'
-//         default:
-//             return 'destructive'
-//     }
-// }
 
 const getStatusVariant = (status: string) => {
     switch (status) {
@@ -211,9 +200,27 @@ const InitFiles = () => {
     }
 }
 
+// 监视当前窗口，如果窗口小于768px，对file.state的文字部分隐藏，只显示状态点
+// 写入mounted生命周期
+
+const handleWindowResize = () => {
+    if (window.innerWidth <= 1122) {
+        showFileStatus.value = false
+    } else {
+        showFileStatus.value = true
+    }
+}
+
 onMounted(() => {
     InitFiles()
+    handleWindowResize()
+    window.addEventListener('resize', handleWindowResize)
 })
+
+onUnmounted(() => {
+    window.removeEventListener('resize', handleWindowResize)
+})
+
 </script>
 
 <style scoped lang="scss">
@@ -260,7 +267,12 @@ onMounted(() => {
                 gap: 0.5rem;
 
                 .file-name {
+                    // only have one line
                     font-weight: 500;
+                    max-width: 150px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
                 }
 
                 .file-type-badge {
