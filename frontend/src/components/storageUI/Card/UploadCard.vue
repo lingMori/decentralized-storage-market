@@ -45,10 +45,9 @@ import timeLaster from '@/lib/data-tools/timeLaster';
 
 const localStore = useLocalStorage();
 const {isConnected} = useWeb3ModalAccount();
-const {open, close} = useWeb3Modal();
 
 const {getSigner} = useInstaShareContract();
-const {register, checkRegistrationStatus} = accountRepo();
+const {checkRegistrationStatus} = accountRepo();
 
 
 const isDragged = ref<boolean>(false);
