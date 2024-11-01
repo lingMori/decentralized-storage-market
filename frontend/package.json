@@ -19,6 +19,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "ethers": "^5.7.2",
+    "graphql-request": "^7.1.0",
     "kubo-rpc-client": "^5.0.1",
     "lucide-vue-next": "^0.407.0",
     "pinia": "^2.1.7",
@@ -28,6 +29,7 @@
     "scss": "^0.2.4",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
+    "vaul-vue": "^0.2.0",
     "vue": "^3.4.29",
     "vue-router": "^4.4.0"
   },

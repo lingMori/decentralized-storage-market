@@ -1,7 +1,6 @@
-import { ethers } from "ethers";
 import { useInstaShareContract } from "./useContract";
 
-export const accountRepo = (): { 
+export const accountRepo = (): {
     register: () => Promise<{ success: boolean; error?: string }>; 
     checkRegistrationStatus: (address: string) => Promise<{ isRegistered: boolean; response?: any }> 
 } => {
