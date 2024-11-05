@@ -1,59 +1,73 @@
 <template>
-  <Dialog :open="!isLoggedIn" @update:open="(val) => updateLoginStatus(!val)">
-    <DialogContent class="sm:max-w-[600px]">
-      <Card class="border-0 shadow-none">
-        <CardHeader>
-          <CardTitle class="text-2xl font-bold text-center">欢迎来到 InstaShare</CardTitle>
-          <CardDescription class="text-center">
-            请完成以下步骤开始您的Web3之旅
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <!-- Updated Stepper -->
-          <Stepper v-model="currentStep" class="mb-8">
-            <StepperItem :step="1">
-              <StepperTrigger>
-                <StepperIndicator>
-                  <Wallet class="h-4 w-4" />
-                </StepperIndicator>
-                <StepperTitle>连接钱包</StepperTitle>
-                <StepperDescription>选择您的Web3钱包或社交账号登录</StepperDescription>
-              </StepperTrigger>
-              <StepperSeparator />
-            </StepperItem>
+  <div class="min-h-screen flex">
+    <div class="container relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
+      <!-- Left Column - Brand Section -->
+      <div class="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
+        <div class="absolute inset-0 bg-zinc-900" />
+        <div class="relative z-20 flex items-center text-lg font-medium">
+          <Wallet class="mr-2 h-6 w-6" />
+          InstaShare
+        </div>
+        <div class="relative z-20 mt-auto">
+          <blockquote class="space-y-2">
+            <p class="text-lg">
+              &ldquo;加入Web3社区，探索去中心化存储的无限可能。在这里，您的数据由您掌控，安全且永久存储。&rdquo;
+            </p>
+            <footer class="text-sm">InstaShare 团队</footer>
+          </blockquote>
+        </div>
+      </div>
 
-            <StepperItem :step="2">
-              <StepperTrigger>
-                <StepperIndicator>
-                  <User class="h-4 w-4" />
-                </StepperIndicator>
-                <StepperTitle>个人信息</StepperTitle>
-                <StepperDescription>设置您的个人资料</StepperDescription>
-              </StepperTrigger>
-              <StepperSeparator />
-            </StepperItem>
+      <!-- Right Column - Registration Form -->
+      <div class="h-full lg:p-8 flex items-center">
+        <div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[450px]">
+          <div class="flex flex-col space-y-2 text-center">
+            <h1 class="text-2xl font-semibold tracking-tight">
+              开始您的 Web3 之旅
+            </h1>
+            <p class="text-sm text-muted-foreground">
+              请完成以下步骤以创建您的账户
+            </p>
+          </div>
 
-            <StepperItem :step="3">
-              <StepperTrigger>
-                <StepperIndicator>
-                  <Shield class="h-4 w-4" />
-                </StepperIndicator>
-                <StepperTitle>安全验证</StepperTitle>
-                <StepperDescription>验证您的身份</StepperDescription>
-              </StepperTrigger>
-            </StepperItem>
-          </Stepper>
+          <Card class="border-0 shadow-none">
+            <CardContent class="space-y-6">
+              <!-- Rest of the content remains the same -->
+              <!-- Stepper -->
+              <Stepper v-model="currentStep" class="mb-8">
+                <StepperItem :step="1">
+                  <StepperTrigger>
+                    <StepperIndicator>
+                      <Wallet class="h-4 w-4" />
+                    </StepperIndicator>
+                    <StepperTitle>连接钱包</StepperTitle>
+                  </StepperTrigger>
+                  <StepperSeparator />
+                </StepperItem>
 
-          <!-- Step 1: Wallet Connection -->
-          <div v-if="currentStep === 1">
-            <Tabs default-value="wallet" class="w-full">
-              <TabsList class="grid w-full grid-cols-2">
-                <TabsTrigger value="wallet">Web3 钱包</TabsTrigger>
-                <TabsTrigger value="social">社交账号</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="wallet" class="space-y-4">
-                <div class="grid gap-4 mt-4">
+                <StepperItem :step="2">
+                  <StepperTrigger>
+                    <StepperIndicator>
+                      <User class="h-4 w-4" />
+                    </StepperIndicator>
+                    <StepperTitle>个人信息</StepperTitle>
+                  </StepperTrigger>
+                  <StepperSeparator />
+                </StepperItem>
+
+                <StepperItem :step="3">
+                  <StepperTrigger>
+                    <StepperIndicator>
+                      <Shield class="h-4 w-4" />
+                    </StepperIndicator>
+                    <StepperTitle>安全验证</StepperTitle>
+                  </StepperTrigger>
+                </StepperItem>
+              </Stepper>
+
+              <!-- Step 1: Wallet Connection -->
+              <div v-if="currentStep === 1" class="space-y-4">
+                <div class="grid gap-4">
                   <Button 
                     class="w-full h-12 bg-orange-600 hover:bg-orange-700 text-white"
                     @click="handleConnectWallet"
@@ -70,112 +84,113 @@
                     <Globe class="mr-2 h-5 w-5" />
                     连接 WalletConnect
                   </Button>
+                  <Separator class="my-4" />
+                  <div class="grid gap-4">
+                    <Button 
+                      v-for="platform in socialPlatforms"
+                      :key="platform.id"
+                      class="w-full h-12" 
+                      variant="outline"
+                      @click="() => handleSocialLogin(platform.id)"
+                    >
+                      <component :is="platform.icon" class="mr-2 h-5 w-5" />
+                      {{ platform.name }}登录
+                    </Button>
+                  </div>
                 </div>
-              </TabsContent>
+              </div>
 
-              <TabsContent value="social" class="space-y-4">
-                <div class="grid gap-4 mt-4">
-                  <Button 
-                    v-for="platform in socialPlatforms"
-                    :key="platform.id"
-                    class="w-full h-12" 
-                    variant="outline"
-                    @click="() => handleSocialLogin(platform.id)"
-                  >
-                    <component :is="platform.icon" class="mr-2 h-5 w-5" />
-                    {{ platform.name }}登录
-                  </Button>
+              <!-- Step 2: Personal Information -->
+              <div v-if="currentStep === 2" class="space-y-4">
+                <div class="space-y-2">
+                  <Label>用户名</Label>
+                  <Input
+                    type="text"
+                    v-model="userDetails.username"
+                    placeholder="请输入用户名"
+                  />
                 </div>
-              </TabsContent>
-            </Tabs>
-          </div>
+                <div class="space-y-2">
+                  <Label>电子邮箱</Label>
+                  <Input
+                    type="email"
+                    v-model="userDetails.email"
+                    placeholder="请输入电子邮箱"
+                  />
+                </div>
+              </div>
 
-          <div v-if="registrationError" class="mt-4 text-red-500 text-sm text-center">
-            {{ registrationError }}
-          </div>
-        </CardContent>
-      </Card>
-    </DialogContent>
+              <!-- Step 3: Security Verification -->
+              <div v-if="currentStep === 3" class="space-y-4">
+                <Alert>
+                  <Mail class="h-4 w-4" />
+                  <AlertTitle>验证您的邮箱</AlertTitle>
+                  <AlertDescription>
+                    我们已经发送验证码到您的邮箱，请查收并输入验证码。
+                  </AlertDescription>
+                </Alert>
+                <div class="space-y-2">
+                  <Label>验证码</Label>
+                  <Input
+                    type="text"
+                    v-model="verificationCode"
+                    placeholder="请输入6位验证码"
+                    maxlength="6"
+                  />
+                </div>
+              </div>
 
-    <!-- Drawer for additional steps -->
-    <Drawer v-model:open="isDrawerOpen">
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>
-            {{ stepTitles[currentStep - 1] }}
-          </DrawerTitle>
-        </DrawerHeader>
-        <div class="p-4">
-          <!-- Step 2: Personal Information -->
-          <div v-if="currentStep === 2" class="space-y-4">
-            <div class="space-y-2">
-              <Label>用户名</Label>
-              <Input
-                type="text"
-                v-model="userDetails.username"
-                placeholder="请输入用户名"
-              />
-            </div>
-            <div class="space-y-2">
-              <Label>电子邮箱</Label>
-              <Input
-                type="email"
-                v-model="userDetails.email"
-                placeholder="请输入电子邮箱"
-              />
-            </div>
-          </div>
+              <div v-if="registrationError" class="text-red-500 text-sm text-center">
+                {{ registrationError }}
+              </div>
 
-          <!-- Step 3: Security Verification -->
-          <div v-if="currentStep === 3" class="space-y-4">
-            <p class="text-sm text-gray-600">
-              请验证您的邮箱地址，我们已经发送验证码到您的邮箱
-            </p>
-            <div class="space-y-2">
-              <Label>验证码</Label>
-              <Input
-                type="text"
-                v-model="verificationCode"
-                placeholder="请输入6位验证码"
-                maxlength="6"
-              />
-            </div>
-          </div>
+              <!-- Navigation Buttons -->
+              <div class="flex justify-between">
+                <Button
+                  variant="outline"
+                  @click="handleBack"
+                  :disabled="currentStep === 1 || isLoading"
+                >
+                  返回
+                </Button>
+                <Button
+                  @click="handleNext"
+                  :disabled="isLoading"
+                >
+                  {{ currentStep === 3 ? '完成注册' : '下一步' }}
+                  <ChevronRight class="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
 
-          <div class="mt-6 flex justify-between">
-            <Button
-              variant="outline"
-              @click="handleBack"
-              :disabled="currentStep === 1"
-            >
-              返回
-            </Button>
-            <Button
-              @click="handleNext"
-              :disabled="isLoading"
-            >
-              {{ currentStep === 3 ? '完成' : '下一步' }}
-              <ChevronRight class="ml-2 h-4 w-4" />
-            </Button>
-          </div>
+          <p class="px-8 text-center text-sm text-muted-foreground">
+            注册即表示您同意我们的
+            <a href="/terms" class="underline underline-offset-4 hover:text-primary">
+              服务条款
+            </a>
+            和
+            <a href="/privacy" class="underline underline-offset-4 hover:text-primary">
+              隐私政策
+            </a>
+          </p>
         </div>
-      </DrawerContent>
-    </Drawer>
-  </Dialog>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
+// Script section remains exactly the same
 import { ref, reactive } from 'vue'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Separator } from '@/components/ui/separator'
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import {
   Stepper,
-  StepperDescription,
   StepperIndicator,
   StepperItem,
   StepperSeparator,
@@ -210,19 +225,10 @@ interface SocialPlatform {
   icon: any
 }
 
-const props = defineProps<{
-  isLoggedIn: boolean
-}>()
-
-const emit = defineEmits<{
-  'update:isLoggedIn': [value: boolean]
-}>()
-
 // State
 const isLoading = ref(false)
 const registrationError = ref<string | null>(null)
-const currentStep = ref(1) // Start from 1 for stepper
-const isDrawerOpen = ref(false)
+const currentStep = ref(1)
 const verificationCode = ref('')
 
 const userDetails = reactive<UserDetails>({
@@ -238,9 +244,6 @@ const { open } = useWeb3Modal()
 const { getSigner } = useInstaShareContract()
 const { register } = accountRepo()
 
-// Step titles for drawer header
-const stepTitles = ['连接钱包', '个人信息', '安全验证']
-
 // Social platforms configuration
 const socialPlatforms: SocialPlatform[] = [
   { id: 'email', name: '邮箱', icon: Mail },
@@ -249,17 +252,11 @@ const socialPlatforms: SocialPlatform[] = [
   { id: 'github', name: 'Github', icon: Github }
 ]
 
-// Methods
-const updateLoginStatus = (value: boolean) => {
-  emit('update:isLoggedIn', value)
-}
-
-const handleNext = () => {
+const handleNext = async () => {
   if (currentStep.value < 3) {
     currentStep.value++
-    isDrawerOpen.value = true
   } else {
-    handleRegister()
+    await handleRegister()
   }
 }
 
@@ -335,7 +332,6 @@ const handleRegister = async () => {
         description: "欢迎加入InstaShare网络！",
         variant: "default"
       })
-      updateLoginStatus(true)
       router.push('/dashboard/upload')
     } else {
       throw new Error(response?.error || '注册失败')
@@ -350,7 +346,6 @@ const handleRegister = async () => {
     })
   } finally {
     isLoading.value = false
-    isDrawerOpen.value = false
   }
 }
 </script>

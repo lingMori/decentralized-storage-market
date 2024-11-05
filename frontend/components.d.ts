@@ -7,6 +7,9 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Alert: typeof import('./src/components/ui/alert/Alert.vue')['default']
+    AlertDescription: typeof import('./src/components/ui/alert/AlertDescription.vue')['default']
+    AlertTitle: typeof import('./src/components/ui/alert/AlertTitle.vue')['default']
     BackCard: typeof import('./src/components/storageUI/Card/BackCard.vue')['default']
     Badge: typeof import('./src/components/ui/badge/Badge.vue')['default']
     BoxCard: typeof import('./src/components/storageUI/Card/BoxCard.vue')['default']
