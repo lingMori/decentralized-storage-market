@@ -37,16 +37,20 @@ import useLocalStorage from '@/store/localStorageDB';
 import type { AddResult, KuboRPCClient } from 'kubo-rpc-client';
 import { formatFileSize } from '@/lib/data-tools/dataFormer';
 import type { FileItem } from '@/lib/ipfs-client/dango-ipfs-ts/types/dango.type';
-import { useWeb3ModalAccount, useWeb3Modal } from '@web3modal/ethers5/vue';
+import { useWeb3ModalAccount } from '@web3modal/ethers5/vue';
 import { useInstaShareContract } from '@/lib/contract-interact/useContract';
 import { accountRepo } from '@/lib/contract-interact/accountRepp';
 import timeLaster from '@/lib/data-tools/timeLaster';
 import { fileRepo } from '@/lib/contract-interact/fileRepo';
 import { BigNumber } from 'ethers';
+import type { File as GraphQLFile } from '@/lib/contract-interact/graphSQL/types/types';
+import { createGraphqlClient } from '@/lib/contract-interact/graphSQL/client/graphqlClient';
+import { SUBGRAPH_API } from '@/configs/SUBGRAPH_API';
+import { findFilesbyAddr } from '@/lib/contract-interact/graphSQL/temp/findFilesbyAddr';
 
 
 const localStore = useLocalStorage();
-const {isConnected} = useWeb3ModalAccount();
+const {isConnected, address} = useWeb3ModalAccount();
 
 const {getSigner} = useInstaShareContract();
 const {checkRegistrationStatus} = accountRepo();
@@ -65,9 +69,60 @@ const fileRef = ref<HTMLInputElement | null>(null);
 const ipfsClient = inject('dangoRPC') as KuboRPCClient;
 
 onMounted(async () => {
-  hasLogin.value = checkLogin()
-  hasRegisted.value = await checkRegister()
+  hasLogin.value = checkLogin();
+  while (!hasLogin.value) {
+    hasLogin.value = checkLogin();
+    if (!hasLogin.value) {
+      await new Promise(r => setTimeout(r, 1000));
+    }
+  }
+  while (!hasRegisted.value) {
+    hasRegisted.value = await checkRegister();
+    if (!hasRegisted.value) {
+      await new Promise(r => setTimeout(r, 1000));
+    }
+  }
+  if (!hasRegisted.value) {
+    return; // Exit if not registered
+  }
+
+  await loadFilesFromGraph();
 })
+
+const loadFilesFromGraph = async () => {
+  localStore.clearCache();
+  try {
+    const graphqlClient = createGraphqlClient(SUBGRAPH_API, findFilesbyAddr(address.value));
+    const result = await graphqlClient as {files: GraphQLFile[]};
+    result.files.push(
+      // add test sample
+      {
+        cid: 'QmY9VHn1KwB4kV3GqZn7pH9JwZwW5KsXs7s5G5v7aK5C',
+        fileName: 'test.txt',
+        isActive: true,
+        lastUpdated: BigInt(0),
+        size: BigInt(0),
+        fileType: 'text/plain'
+      } as GraphQLFile
+    )
+    const fileList: FileItem[] = result.files.map(file => {
+      return {
+        name: file.fileName,
+        cid: file.cid,
+        status: `${file.isActive? 'active': 'false'}`,
+        lastModified: file.lastUpdated.toString(),
+        size: file.size.toString(),
+        type: file.fileType
+      } as FileItem;
+    })
+    console.log('hhhhhhh')
+    setTimeout(() => {
+      localStore.addResults(fileList);
+    }, 2000)
+  }catch (e) {
+    console.log(e)
+  }
+}
 
 
 const fileCount = computed(() => {
@@ -140,7 +195,6 @@ const uploadFileHandler = async (file: File): Promise<FileItem> => {
 
 const checkLogin = ():boolean => {
   try {
-    
     const status:boolean = isConnected.value? true: false;
     return status
 
@@ -155,7 +209,7 @@ const checkRegister = async ():Promise<boolean> => {
   try{
     const address = await getSigner().getAddress()
     const {isRegistered} = await checkRegistrationStatus(address)
-
+    console.log("has registered: ", isRegistered)
     return isRegistered;
 
   }catch (error) {
@@ -167,7 +221,6 @@ const checkRegister = async ():Promise<boolean> => {
 const onFileChangeHandler = async() => {
   
     isUploading.value = true;
-    // const uploadFileHander:Promise<IpfsUploadResult>[] = [];
     
     if (fileRef.value?.files) {
         if (!checkLogin()) {
@@ -195,8 +248,6 @@ const onFileChangeHandler = async() => {
           finished.value = 0;
           isUploading.value = false;
           fileRef.value.value = ""
-          // console.log(localStorage.getItem("storageApp"))
-          // localStore.clearCache();
         }
     }
 }

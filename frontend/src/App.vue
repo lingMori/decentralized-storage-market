@@ -4,14 +4,13 @@
 
 <script setup lang="ts">
 
-import { onMounted } from 'vue';
 import walletModel from './lib/web3-wallect';
+import useLocalStorage from './store/localStorageDB';
 
 const model = walletModel;
+const localStorageDB = useLocalStorage();
+localStorageDB.clearCache();
 
-onMounted(() => {
-  
-})
 
 </script>
 

@@ -3,7 +3,7 @@ import Storage from "@/lib/local-storage/storage";
 import { ref } from "vue";
 import type { FileItem } from "@/lib/ipfs-client/dango-ipfs-ts/types/dango.type";
 
-const localStorageDB = new Storage("storageApp");
+const localStorageDB = new Storage("storageApp"); // localStorageDB is a typescript class
 
 localStorageDB.read();
 localStorageDB.data ||= { version:"0.0.1", results: []}
