@@ -4,9 +4,14 @@
 
 <script setup lang="ts">
 
+import { onMounted } from 'vue';
 import walletModel from './lib/web3-wallect';
 
 const model = walletModel;
+
+onMounted(() => {
+  
+})
 
 </script>
 

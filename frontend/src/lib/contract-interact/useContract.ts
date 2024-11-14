@@ -1,8 +1,9 @@
 import { ethers } from "ethers";
 import instaABI from "../../../../contract/data-market/abi/InstaShare.json"
 import { contractAddress } from "@/configs/CONTRACT_ADDRESS";
+import type { InstaShareHook, InstaShareContract } from "./type";
 
-export const useInstaShareContract = (): { getSigner: () => ethers.Signer; getContract: () => ethers.Contract } => {
+export const useInstaShareContract = (): InstaShareHook => {
     const contract_address = contractAddress;
     const INSTAabi = instaABI;
     
@@ -15,9 +16,9 @@ export const useInstaShareContract = (): { getSigner: () => ethers.Signer; getCo
         return signer;
     }
 
-    const getContract = ():ethers.Contract => {
+    const getContract = ():InstaShareContract => {
         const signer = getSigner();
-        const contract = new ethers.Contract(contract_address, INSTAabi, signer);
+        const contract = new ethers.Contract(contract_address, INSTAabi, signer) as InstaShareContract;
         return contract;
     }
 

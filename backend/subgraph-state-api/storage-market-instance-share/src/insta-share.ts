@@ -18,6 +18,7 @@ import {
 } from "../generated/schema"
 import { BigInt } from "@graphprotocol/graph-ts"
 
+// 上传文件
 export function handleFileUploaded(event: FileUploaded): void {
   let fileId = event.params.owner.toHexString() + '-' + event.params.cid
   let file = new File(fileId)
@@ -68,6 +69,7 @@ export function handleFileUploaded(event: FileUploaded): void {
   }
 }
 
+// 移除文件
 export function handleFileRemoved(event: FileRemoved): void {
   let fileId = event.params.owner.toHexString() + '-' + event.params.cid
   let file = File.load(fileId)
@@ -111,6 +113,7 @@ export function handleFileRemoved(event: FileRemoved): void {
   }
 }
 
+// 处理新用户注册逻辑
 export function handleInstanceOwnerRegistered(event: InstanceOwnerRegistered): void {
   let user = new User(event.params.ownerAddress.toHexString())
   user.totalFiles = BigInt.fromI32(0)
@@ -144,7 +147,7 @@ export function handleInstanceOwnerRegistered(event: InstanceOwnerRegistered): v
   stats.save()
 }
 
-// 新增MaxLoadUpdated事件处理函数
+// 更新最大容量
 export function handleMaxLoadUpdated(event: MaxLoadUpdated): void {
   let user = User.load(event.params.ownerAddress.toHexString())
   
@@ -164,7 +167,7 @@ export function handleMaxLoadUpdated(event: MaxLoadUpdated): void {
   }
 }
 
-// 其他处理函数保持不变...
+// 更新文件状态
 export function handleFileStatusUpdated(event: FileStatusUpdated): void {
   let fileId = event.params.owner.toHexString() + '-' + event.params.cid
   let file = File.load(fileId)
@@ -197,6 +200,7 @@ export function handleFileStatusUpdated(event: FileStatusUpdated): void {
   }
 }
 
+// 更新文件上传
 export function handleFreeLoadUpdated(event: FreeLoadUpdated): void {
   let user = User.load(event.params.ownerAddress.toHexString())
   
@@ -216,6 +220,7 @@ export function handleFreeLoadUpdated(event: FreeLoadUpdated): void {
   }
 }
 
+// 更新实例锁定
 export function handleInstanceLockStatusUpdated(event: InstanceLockStatusUpdated): void {
   let user = User.load(event.params.owner.toHexString())
   
@@ -235,6 +240,7 @@ export function handleInstanceLockStatusUpdated(event: InstanceLockStatusUpdated
   }
 }
 
+// 更新实例拥有者
 export function handleOwnershipTransferred(event: OwnershipTransferred): void {
   let config = SystemConfig.load("1")
   if (config == null) {

@@ -6,7 +6,7 @@
                  @dragleave="onDragLeave"
                  @dragover.prevent
                  @drop.prevent="onDropHandler">
-                 <input type="file" multiple ref="fileRef" @change="onFileChangeHandler"/>
+                 <input type="file" ref="fileRef" @change="onFileChangeHandler"/>
                  <div class="dropzone-label" @click="openSelectFile">
                     <i-mdi-timer-sand v-if="(fileCount > 0)" class="icon-color" />
                     <i-mdi-upload v-else class="icon-color" />
@@ -41,6 +41,8 @@ import { useWeb3ModalAccount, useWeb3Modal } from '@web3modal/ethers5/vue';
 import { useInstaShareContract } from '@/lib/contract-interact/useContract';
 import { accountRepo } from '@/lib/contract-interact/accountRepp';
 import timeLaster from '@/lib/data-tools/timeLaster';
+import { fileRepo } from '@/lib/contract-interact/fileRepo';
+import { BigNumber } from 'ethers';
 
 
 const localStore = useLocalStorage();
@@ -95,23 +97,46 @@ const onDropHandler = (event:DragEvent) => {
 }
 
 const uploadFileHandler = async (file: File): Promise<FileItem> => {
+    if (!file) {
+        console.log('File is null or undefined');
+        return {} as FileItem;
+    }
+
+    const { uploadFile } = fileRepo();
+    let responseIPFS: AddResult;
+    let responseChain;
+
     try {
-        const response: AddResult = await ipfsClient.add(file);
-        return {
-            name: file.name,
-            cid: response.cid.toString(),
-            status: 'active',
-            lastModified: file.lastModified.toString(),
-            size: file.size.toString(),
-            type: file.type
-        } as FileItem;
+        responseIPFS = await ipfsClient.add(file);
     } catch (error) {
-        console.log('upload file error', error);
-        return {} as FileItem; // Return empty object if error occurs
+        console.log('IPFS upload error:', error);
+        return {} as FileItem;
+    }
+
+    try {
+        responseChain = await uploadFile({
+            cid: responseIPFS.cid.toString(),
+            fileName: file.name,
+            fileSize: BigNumber.from(file.size),
+            fileType: file.type
+        });
+    } catch (error) {
+        console.log('Chain upload error:', error);
+        return {} as FileItem;
     } finally {
         finished.value++;
     }
-};
+
+    return {
+        txResult: responseChain,
+        name: file.name,
+        cid: responseIPFS.cid.toString(),
+        status: 'active',
+        lastModified: file.lastModified.toString(),
+        size: file.size.toString(),
+        type: file.type
+    } as FileItem;
+}
 
 const checkLogin = ():boolean => {
   try {
