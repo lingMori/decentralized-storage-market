@@ -94,17 +94,17 @@ const loadFilesFromGraph = async () => {
   try {
     const graphqlClient = createGraphqlClient(SUBGRAPH_API, findFilesbyAddr(address.value));
     const result = await graphqlClient as {files: GraphQLFile[]};
-    result.files.push(
-      // add test sample
-      {
-        cid: 'QmY9VHn1KwB4kV3GqZn7pH9JwZwW5KsXs7s5G5v7aK5C',
-        fileName: 'test.txt',
-        isActive: true,
-        lastUpdated: BigInt(0),
-        size: BigInt(0),
-        fileType: 'text/plain'
-      } as GraphQLFile
-    )
+    // result.files.push(
+    //   // add test sample
+    //   {
+    //     cid: 'QmY9VHn1KwB4kV3GqZn7pH9JwZwW5KsXs7s5G5v7aK5C',
+    //     fileName: 'test.txt',
+    //     isActive: true,
+    //     lastUpdated: BigInt(0),
+    //     size: BigInt(0),
+    //     fileType: 'text/plain'
+    //   } as GraphQLFile
+    // )
     const fileList: FileItem[] = result.files.map(file => {
       return {
         name: file.fileName,
@@ -115,10 +115,8 @@ const loadFilesFromGraph = async () => {
         type: file.fileType
       } as FileItem;
     })
-    console.log('hhhhhhh')
-    setTimeout(() => {
-      localStore.addResults(fileList);
-    }, 2000)
+    // console.log('hhhhhhh')
+    localStore.addResults(fileList);
   }catch (e) {
     console.log(e)
   }
