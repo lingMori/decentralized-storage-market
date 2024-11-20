@@ -95,6 +95,7 @@ import { MoreHorizontal } from 'lucide-vue-next'
 import Card from '@/components/ui/card/Card.vue'
 import Badge from '@/components/ui/badge/Badge.vue'
 import Button from '@/components/ui/button/Button.vue'
+import { onBeforeRouteUpdate, useRoute } from 'vue-router'
 import Checkbox from '@/components/ui/checkbox/Checkbox.vue'
 import ScrollArea from '@/components/ui/scroll-area/ScrollArea.vue'
 import {
@@ -107,14 +108,26 @@ import {
 import type { FileItem } from '@/lib/ipfs-client/dango-ipfs-ts/types/dango.type'
 
 const files = ref<FileItem[]>([])
+const originFiles = ref<FileItem[]>([])
 const selectedFiles = ref<FileItem[]>([])
 const showFileStatus = ref<boolean>(false)
+
+const route = useRoute()
 
 const FileType: string[] = [
     "image",
     "mp4",
     "video"
 ]
+
+const handleNavigation = (view: string) => {
+    if (FileType.includes(view)) {
+        files.value = originFiles.value.filter(file => file.type === view)
+    }else {
+        files.value = [...originFiles.value]
+    }
+    console.log(`当前视图已经切换${view}`)
+}
 
 // 计算全选状态
 const selectAll = computed(() => {
@@ -189,7 +202,7 @@ const InitFiles = () => {
     const statusOptions: FileItem['status'][] = ['active', 'pending', 'archived', 'false']
     
     for (let i = 0; i < 10; i++) {
-        files.value.push({
+        originFiles.value.push({
             name: `文件_${i + 1}`,
             cid: `cid_${Math.random().toString(36).substr(2, 9)}`,
             status: statusOptions[i % 4],
@@ -198,6 +211,7 @@ const InitFiles = () => {
             type: FileType[i % 3],
         })
     }
+    files.value = [...originFiles.value]
 }
 
 // 监视当前窗口，如果窗口小于768px，对file.state的文字部分隐藏，只显示状态点
@@ -213,12 +227,20 @@ const handleWindowResize = () => {
 
 onMounted(() => {
     InitFiles()
+    handleNavigation(route.query.view?.toString() || 'all')
     handleWindowResize()
     window.addEventListener('resize', handleWindowResize)
 })
 
 onUnmounted(() => {
     window.removeEventListener('resize', handleWindowResize)
+})
+
+onBeforeRouteUpdate((to, from, next) => {
+    if (to.query.view !== from.query.view) {
+        handleNavigation(to.query.view?.toString() || 'all')
+    }
+    next()  
 })
 
 </script>

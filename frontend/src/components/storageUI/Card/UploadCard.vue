@@ -55,16 +55,13 @@ const {isConnected, address} = useWeb3ModalAccount();
 const {getSigner} = useInstaShareContract();
 const {checkRegistrationStatus} = accountRepo();
 
-
+const isFileInited = ref<boolean>(false);
 const isDragged = ref<boolean>(false);
 const isUploading = ref<boolean>(false);
 const isUploaded = ref<boolean>(false);
 const finished = ref<number>(0);
-const hasRegisted = ref<boolean>(true)
+const hasRegisted = ref<boolean>(true);
 const hasLogin = ref<boolean>(true);
-const updateLoginStatus = (value: boolean) => {
-  hasLogin.value = value;
-};
 const fileRef = ref<HTMLInputElement | null>(null);
 const ipfsClient = inject('dangoRPC') as KuboRPCClient;
 
@@ -89,22 +86,15 @@ onMounted(async () => {
   await loadFilesFromGraph();
 })
 
+const updateLoginStatus = (value: boolean) => {
+  hasLogin.value = value;
+};
+
 const loadFilesFromGraph = async () => {
   localStore.clearCache();
   try {
     const graphqlClient = createGraphqlClient(SUBGRAPH_API, findFilesbyAddr(address.value));
     const result = await graphqlClient as {files: GraphQLFile[]};
-    // result.files.push(
-    //   // add test sample
-    //   {
-    //     cid: 'QmY9VHn1KwB4kV3GqZn7pH9JwZwW5KsXs7s5G5v7aK5C',
-    //     fileName: 'test.txt',
-    //     isActive: true,
-    //     lastUpdated: BigInt(0),
-    //     size: BigInt(0),
-    //     fileType: 'text/plain'
-    //   } as GraphQLFile
-    // )
     const fileList: FileItem[] = result.files.map(file => {
       return {
         name: file.fileName,

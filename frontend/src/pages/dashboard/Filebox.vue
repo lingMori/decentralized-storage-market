@@ -64,6 +64,7 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
 })
+
 </script>
 
 <style scoped lang="scss">

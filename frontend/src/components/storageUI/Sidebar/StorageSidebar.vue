@@ -85,6 +85,7 @@ import {
     MusicIcon,
     SettingsIcon 
 } from 'lucide-vue-next'
+import router from '@/router';
 
 const currentView = ref('all')
 const isLoading = ref(true)
@@ -105,7 +106,9 @@ const formatStorage = (size: number) => {
 
 const handleNavigation = (view: string) => {
     currentView.value = view
-    // 触发路由或状态更新
+    // 触发路由或状态更新，在路由中增加view参数作为查询参数，使用vue router
+    router.push({ query: { view } })
+
 }
 
 const getUsedStorage = async():Promise<number> => {
