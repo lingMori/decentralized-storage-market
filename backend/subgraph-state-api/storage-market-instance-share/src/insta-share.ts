@@ -70,6 +70,7 @@ export function handleFileUploaded(event: FileUploaded): void {
 }
 
 // 移除文件
+// 文件移除的逻辑并不是删除文件，而是对文件状态进行封锁，封锁后的文件将不能直接进行访问（‘state：Removed’）
 export function handleFileRemoved(event: FileRemoved): void {
   let fileId = event.params.owner.toHexString() + '-' + event.params.cid
   let file = File.load(fileId)
