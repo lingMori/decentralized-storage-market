@@ -2,7 +2,7 @@ import type {
     ImportCandidate, 
     AddOptions, AddResult, 
     ImportCandidateStream, 
-    AddAllOptions, IPFSPath, CatOptions, GetOptions, ListOptions, IPFSEntry, KuboRPCClient} from "kubo-rpc-client"
+    AddAllOptions, IPFSPath, CatOptions, GetOptions, ListOptions, IPFSEntry} from "kubo-rpc-client"
 
 
 export interface dangoConfig {

@@ -151,9 +151,9 @@ const connectWallet = async () => {
   try {
     await open()
     // 添加超时和重试机制
-    const connectTimeout = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('连接钱包超时')), 30000)
-    ) // Added closing parenthesis here
+    // const connectTimeout = new Promise((_, reject) => 
+    //   setTimeout(() => reject(new Error('连接钱包超时')), 30000)
+    // ) // Added closing parenthesis here
 
     await Promise.race([
       new Promise<void>(resolve => {

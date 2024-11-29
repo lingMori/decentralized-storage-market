@@ -14,7 +14,7 @@
     "workbench.list.smoothScrolling": true,
     "workbench.preferredDarkColorTheme": "Vitesse Dark",
     "workbench.preferredLightColorTheme": "Vitesse Light",
-    "workbench.productIconTheme": "icons-carbon",
+    "workbench.productIconTheme": "bongocat",
     "workbench.sideBar.location": "right",
     "workbench.startupEditor": "newUntitledFile",
     "workbench.tree.expandMode": "singleClick",
@@ -133,7 +133,9 @@
       "yaml",
       "toml"
     ],
-  
+    "eslint.runtime": "node",
+    // "eslint.nodePath": "/Users/ask/Documents/code/github/storage-market/frontend/node_modules/",
+
     "github.copilot.enable": {
       "*": true,
       "markdown": true,

@@ -214,6 +214,10 @@ const InitFiles = () => {
     files.value = [...originFiles.value]
 }
 
+const InitFilesFormChain = () => {
+    // TODO
+}
+
 // 监视当前窗口，如果窗口小于768px，对file.state的文字部分隐藏，只显示状态点
 // 写入mounted生命周期
 
