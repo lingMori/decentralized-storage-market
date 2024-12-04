@@ -76,6 +76,7 @@ declare module 'vue' {
     SearchInput: typeof import('./src/components/storageUI/Input/SearchInput.vue')['default']
     Separator: typeof import('./src/components/ui/separator/Separator.vue')['default']
     ServerSelectMenu: typeof import('./src/components/storageUI/Menu/ServerSelectMenu.vue')['default']
+    Sonner: typeof import('./src/components/ui/sonner/Sonner.vue')['default']
     Stepper: typeof import('./src/components/ui/stepper/Stepper.vue')['default']
     StepperDescription: typeof import('./src/components/ui/stepper/StepperDescription.vue')['default']
     StepperIndicator: typeof import('./src/components/ui/stepper/StepperIndicator.vue')['default']

@@ -1,12 +1,14 @@
 <template>
-  <router-view></router-view>
+  <Toaster />
+  <router-view>
+  </router-view>
 </template>
 
 <script setup lang="ts">
 
 import walletModel from './lib/web3-wallect';
 import useLocalStorage from './store/localStorageDB';
-
+import { Toaster } from '@/components/ui/sonner'
 const model = walletModel;
 const localStorageDB = useLocalStorage();
 localStorageDB.clearCache();

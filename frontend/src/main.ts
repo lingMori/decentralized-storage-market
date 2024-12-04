@@ -11,14 +11,14 @@ import type { dangoConfig } from "./lib/ipfs-client/dango-ipfs-ts/types/dango.ty
 
 const dangoRPCConfig:dangoConfig = {
     protocol: 'http',
-    host: '10.130.144.181',
-    port: '15001',
+    host: '82.157.200.60',
+    port: '17501',
 }
 
 const dangoGatewayConfig:dangoConfig = {
     protocol: 'http',
-    host: '10.130.144.181',
-    port: '18080',
+    host: '82.157.200.60',
+    port: '17801',
 }
 
 const storageApp = createApp(App);

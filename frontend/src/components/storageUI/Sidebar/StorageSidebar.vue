@@ -3,9 +3,13 @@
         <div class="sidebar-header">
             <div class="storage-info">
                 <h3 class="storage-title">存储空间</h3>
-                <Progress v-model="usedStorage" :is-loading=isLoading class="storage-progress" />
+                <Progress 
+                    :model-value="(props.user.usedStorage / props.user.totalStorage) * 100" 
+                    :is-loading="props.isLoading" 
+                    class="storage-progress" 
+                />
                 <p class="storage-details">
-                    已使用 {{ formatStorage(usedStorage) }} / {{ formatStorage(totalStorage) }}
+                    已使用 {{ formatStorage(props.user.usedStorage) }} / {{ formatStorage(props.user.totalStorage) }}
                 </p>
             </div>
         </div>
@@ -72,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import Button from '@/components/ui/button/Button.vue'
 import Progress from '@/components/ui/progress/Progress.vue';
 import { 
@@ -85,52 +89,40 @@ import {
     MusicIcon,
     SettingsIcon 
 } from 'lucide-vue-next'
+import { formatStorage } from '@/lib/data-tools/dataFormer';
 import router from '@/router';
 
 const currentView = ref('all')
-const isLoading = ref(true)
 
-const usedStorage = ref(0) // GB
-const totalStorage = ref(100) // GB
+// Define props interface
+interface UserStorage {
+    totalStorage: number;
+    usedStorage: number;
+}
+
+const props = withDefaults(defineProps<{
+    user: UserStorage
+    isLoading?: boolean
+}>(), {
+    user: () => ({
+        totalStorage: 100,
+        usedStorage: 0
+    }),
+    isLoading: false
+})
 
 const fileTypes = [
     { id: 'image', name: '图片', icon: ImageIcon },
-    { id: 'document', name: '文档', icon: FileTextIcon },
+    { id: 'application', name: '文档', icon: FileTextIcon },
     { id: 'video', name: '视频', icon: VideoIcon },
     { id: 'audio', name: '音频', icon: MusicIcon },
 ]
-
-const formatStorage = (size: number) => {
-    return `${size}GB`
-}
 
 const handleNavigation = (view: string) => {
     currentView.value = view
     // 触发路由或状态更新，在路由中增加view参数作为查询参数，使用vue router
     router.push({ query: { view } })
-
 }
-
-const getUsedStorage = async():Promise<number> => {
-    // 获取已使用存储
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(Math.floor(Math.random() * 100));
-        }, 1000);
-    });
-}
-
-const updateUsedStorage = async() => {
-    // 更新已使用存储
-    const newUsedStorage = await getUsedStorage()
-    isLoading.value = false
-    usedStorage.value = newUsedStorage
-}
-
-onMounted(() => {
-    updateUsedStorage()
-})
-
 </script>
 
 <style scoped lang="scss">

@@ -132,6 +132,7 @@ const files = computed<FileItem[]>(() => localStore
   .slice()
   .reverse()
   .filter((file): file is FileItem & { cid: string } => !!file.cid)
+  .filter(file => file.status === 'active')
   .filter(file => {
     if (!search.value) return true
     return file.name.toLowerCase().includes(search.value.toLowerCase())

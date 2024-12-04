@@ -1,4 +1,4 @@
-import { gql, request } from "graphql-request";
+import { gql } from "graphql-request";
 
 export const findFilesbyAddr = (address: string):string => {
   const subAddress = address.toLowerCase();

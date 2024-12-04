@@ -15,7 +15,7 @@ export interface dangoConfig {
 export interface FileItem {
     name: string
     cid: string
-    status: 'active' | 'pending' | 'archived' | 'false'
+    status: 'active' | 'pending' | 'archived' | 'false' | 'removed'
     lastModified: string
     size: string
     type: string

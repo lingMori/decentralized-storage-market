@@ -16,6 +16,47 @@
 		"type": "error"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "string[]",
+				"name": "cids",
+				"type": "string[]"
+			}
+		],
+		"name": "batchRemoveFiles",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string[]",
+				"name": "cids",
+				"type": "string[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "fileSizes",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "string[]",
+				"name": "fileTypes",
+				"type": "string[]"
+			},
+			{
+				"internalType": "string[]",
+				"name": "fileNames",
+				"type": "string[]"
+			}
+		],
+		"name": "batchUploadFiles",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "EnforcedPause",
 		"type": "error"
@@ -81,6 +122,13 @@
 		],
 		"name": "OwnableUnauthorizedAccount",
 		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "pause",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
 		"inputs": [],
@@ -283,6 +331,71 @@
 		"type": "event"
 	},
 	{
+		"inputs": [],
+		"name": "registerInstanceOwner",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "cid",
+				"type": "string"
+			}
+		],
+		"name": "removeFile",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "ownerAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "bool",
+				"name": "locked",
+				"type": "bool"
+			}
+		],
+		"name": "setInstanceLock",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "unpause",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -294,6 +407,70 @@
 		],
 		"name": "Unpaused",
 		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "cid",
+				"type": "string"
+			},
+			{
+				"internalType": "bool",
+				"name": "isActive",
+				"type": "bool"
+			}
+		],
+		"name": "updateFileStatus",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "newMaxLoad",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "ownerAddress",
+				"type": "address"
+			}
+		],
+		"name": "updateMaxLoad",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "cid",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "fileSize",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "fileType",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "fileName",
+				"type": "string"
+			}
+		],
+		"name": "uploadFile",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
 		"inputs": [
@@ -453,13 +630,6 @@
 	},
 	{
 		"inputs": [],
-		"name": "pause",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
 		"name": "paused",
 		"outputs": [
 			{
@@ -469,135 +639,6 @@
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "registerInstanceOwner",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "cid",
-				"type": "string"
-			}
-		],
-		"name": "removeFile",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "renounceOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "ownerAddress",
-				"type": "address"
-			},
-			{
-				"internalType": "bool",
-				"name": "locked",
-				"type": "bool"
-			}
-		],
-		"name": "setInstanceLock",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "transferOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "unpause",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "cid",
-				"type": "string"
-			},
-			{
-				"internalType": "bool",
-				"name": "isActive",
-				"type": "bool"
-			}
-		],
-		"name": "updateFileStatus",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "newMaxLoad",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "ownerAddress",
-				"type": "address"
-			}
-		],
-		"name": "updateMaxLoad",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "cid",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "fileSize",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "fileType",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "fileName",
-				"type": "string"
-			}
-		],
-		"name": "uploadFile",
-		"outputs": [],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	}
 ]

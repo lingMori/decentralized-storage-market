@@ -40,14 +40,15 @@ import type { FileItem } from '@/lib/ipfs-client/dango-ipfs-ts/types/dango.type'
 import { useWeb3ModalAccount } from '@web3modal/ethers5/vue';
 import { useInstaShareContract } from '@/lib/contract-interact/useContract';
 import { accountRepo } from '@/lib/contract-interact/accountRepp';
-import timeLaster from '@/lib/data-tools/timeLaster';
+// import timeLaster from '@/lib/data-tools/timeLaster';
 import { fileRepo } from '@/lib/contract-interact/fileRepo';
 import { BigNumber } from 'ethers';
 import type { File as GraphQLFile } from '@/lib/contract-interact/graphSQL/types/types';
 import { createGraphqlClient } from '@/lib/contract-interact/graphSQL/client/graphqlClient';
 import { SUBGRAPH_API } from '@/configs/SUBGRAPH_API';
 import { findFilesbyAddr } from '@/lib/contract-interact/graphSQL/temp/findFilesbyAddr';
-
+import { toast } from 'vue-sonner';
+import { formatDate } from '@/lib/data-tools/dataFormer'
 
 const localStore = useLocalStorage();
 const {isConnected, address} = useWeb3ModalAccount();
@@ -55,10 +56,9 @@ const {isConnected, address} = useWeb3ModalAccount();
 const {getSigner} = useInstaShareContract();
 const {checkRegistrationStatus} = accountRepo();
 
-const isFileInited = ref<boolean>(false);
 const isDragged = ref<boolean>(false);
 const isUploading = ref<boolean>(false);
-const isUploaded = ref<boolean>(false);
+// const isUploaded = ref<boolean>(false);
 const finished = ref<number>(0);
 const hasRegisted = ref<boolean>(true);
 const hasLogin = ref<boolean>(true);
@@ -163,8 +163,26 @@ const uploadFileHandler = async (file: File): Promise<FileItem> => {
             fileSize: BigNumber.from(file.size),
             fileType: file.type
         });
+        toast('文件添加成功', {
+          description: `文件 ${file.name} 上传与 ${formatDate(file.lastModified)}`,
+          action: {
+            label: 'undo',
+            onClick: () => console.log('Undo')
+          }
+        })
     } catch (error) {
         console.log('Chain upload error:', error);
+        // ipfs remove file
+        try {
+          await ipfsClient.pin.rm(responseIPFS.cid);
+          for await (const res of ipfsClient.repo.gc()) {
+            console.log(res)
+          }
+          console.log(`File with CID ${responseIPFS.cid.toString()} has been unpinned from IPFS.`);
+          // Removed unused assignment to 'files'
+        } catch (error) {
+            console.log('IPFS remove error:', error);
+        }
         return {} as FileItem;
     } finally {
         finished.value++;

@@ -119,6 +119,65 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
         emit FreeLoadUpdated(msg.sender, owner.freeLoad);
     }
 
+    function batchUploadFiles(
+        string[] calldata cids,
+        uint256[] calldata fileSizes,
+        string[] calldata fileTypes,
+        string[] calldata fileNames
+    ) public whenNotPaused onlyRegistered notLocked nonReentrant {
+        uint256 totalFiles = cids.length;
+
+        if (
+            totalFiles != fileSizes.length ||
+            totalFiles != fileTypes.length ||
+            totalFiles != fileNames.length
+        ) {
+            revert("Input array lengths must match");
+        }
+
+        InstanceOwner storage owner = instanceOwners[msg.sender];
+
+        for (uint256 i = 0; i < totalFiles; i++) {
+            string memory cid = cids[i];
+            uint256 fileSize = fileSizes[i];
+            string memory fileType = fileTypes[i];
+            string memory fileName = fileNames[i];
+
+            if (fileSize == 0 || fileSize > 100 * 1024 * 1024) {
+                revert InvalidFileSize();
+            }
+            if (bytes(cid).length == 0) {
+                revert InvalidCID();
+            }
+            if (owner.files[cid].exists) { // 修改：使用exists检查
+                revert FileAlreadyExists();
+            }
+            if (owner.freeLoad < fileSize) {
+                revert InsufficientFreeLoad();
+            }
+
+            FileInfo memory newFile = FileInfo({
+                cid: cid,
+                size: fileSize,
+                timestamp: block.timestamp,
+                fileType: fileType,
+                isActive: true,
+                exists: true  // 设置exists标记
+            });
+
+            owner.files[cid] = newFile;
+            owner.fileIndexes[cid] = owner.fileList.length; // 记录索引
+            owner.fileList.push(cid);
+            owner.totalFiles++;
+            owner.freeLoad -= fileSize;
+
+            emit FileUploaded(msg.sender, cid, fileSize, fileType, fileName);
+        }
+
+        emit FreeLoadUpdated(msg.sender, owner.freeLoad);
+    }
+
+
     function removeFile(string calldata cid) public whenNotPaused onlyRegistered notLocked {
         InstanceOwner storage owner = instanceOwners[msg.sender];
         FileInfo storage file = owner.files[cid];
@@ -153,6 +212,46 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
         emit FileRemoved(msg.sender, cid);
         emit FreeLoadUpdated(msg.sender, owner.freeLoad);
     }
+
+    function batchRemoveFiles(string[] calldata cids) public whenNotPaused onlyRegistered notLocked {
+        InstanceOwner storage owner = instanceOwners[msg.sender];
+
+        for (uint256 i = 0; i < cids.length; i++) {
+            string memory cid = cids[i];
+            FileInfo storage file = owner.files[cid];
+
+            if (!file.exists) {
+                revert FileNotFound();
+            }
+
+            // 返还存储空间
+            owner.freeLoad += file.size;
+            
+            // 从fileList数组中移除
+            uint256 fileIndex = owner.fileIndexes[cid];
+            uint256 lastIndex = owner.fileList.length - 1;
+
+            if (fileIndex != lastIndex) {
+                string memory lastCid = owner.fileList[lastIndex];
+                owner.fileList[fileIndex] = lastCid;
+                owner.fileIndexes[lastCid] = fileIndex; // 更新被移动文件的索引
+            }
+            owner.fileList.pop();
+            
+            // 清除索引映射
+            delete owner.fileIndexes[cid];
+            
+            // 标记文件为不存在，而不是完全删除
+            file.exists = false;
+            file.isActive = false;
+
+            owner.totalFiles--;
+            emit FileRemoved(msg.sender, cid);
+        }
+
+        emit FreeLoadUpdated(msg.sender, owner.freeLoad);
+    }
+
 
     function updateFileStatus(string calldata cid, bool isActive) public whenNotPaused onlyRegistered {
         FileInfo storage file = instanceOwners[msg.sender].files[cid];
