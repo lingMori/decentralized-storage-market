@@ -11,7 +11,7 @@
         <div class="header-actions">
           <ServerSelectMenu @server-selected="handleServerChange" />
           <div class="action-buttons">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" @click="openSelectFile">
               <UploadCloud class="w-4 h-4 mr-2" />
               Upload Files
             </Button>
@@ -27,6 +27,8 @@
       </div>
     </div>
   </section>
+  <SwitchServerLoading  :show="isUploading"/>
+  <input style="display: none;" type="file" ref="fileRef" @change="onFileChangeHandler"/>
 </template>
 
 <script setup lang="ts">
@@ -44,6 +46,8 @@ import { findFilesbyAddr } from '@/lib/contract-interact/graphSQL/temp/findFiles
 import { useWeb3ModalAccount } from '@web3modal/ethers5/vue'
 import type { User as GraphQLUser, File as GraphQLFile} from '@/lib/contract-interact/graphSQL/types/types'
 import useLocalStorage from '@/store/localStorageDB'
+import { useFileUpload } from '@/lib/components-tools/file-upload'
+import SwitchServerLoading from '@/components/storageUI/Loading/SwitchServerLoading.vue'
 // Define props interface
 interface UserStorage {
    totalStorage: number;
@@ -59,7 +63,9 @@ const userStorage = ref<UserStorage>({
    totalStorage: 100,
    usedStorage: 0
 })
+const { isUploading, fileRef, onFileChangeHandler} = useFileUpload()
 
+const openSelectFile = () => {if (isUploading.value) return false; fileRef.value?.click()}
 // 获取header高度的函数
 const updateHeaderHeight = () => {
  const header = document.querySelector('header')

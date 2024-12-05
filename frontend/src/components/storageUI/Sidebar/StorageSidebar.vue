@@ -67,11 +67,12 @@
         </nav>
 
         <div class="sidebar-footer">
-            <Button variant="outline" class="settings-btn">
+            <Button variant="outline" class="settings-btn" @click="openSettings">
                 <SettingsIcon class="nav-icon" />
                 设置
             </Button>
         </div>
+        <StorageSettings ref="storageSettingsRef"/>
     </div>
 </template>
 
@@ -91,8 +92,10 @@ import {
 } from 'lucide-vue-next'
 import { formatStorage } from '@/lib/data-tools/dataFormer';
 import router from '@/router';
+import StorageSettings from '../Dialog/StorageSettings.vue';
 
 const currentView = ref('all')
+const storageSettingsRef = ref(null)
 
 // Define props interface
 interface UserStorage {
@@ -117,6 +120,13 @@ const fileTypes = [
     { id: 'video', name: '视频', icon: VideoIcon },
     { id: 'audio', name: '音频', icon: MusicIcon },
 ]
+
+const openSettings = () => {
+    // 调用子组件的 openSettings 方法
+    if (storageSettingsRef.value) {
+        (storageSettingsRef.value as any).openSettings()
+    }
+}
 
 const handleNavigation = (view: string) => {
     currentView.value = view
