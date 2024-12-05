@@ -11,13 +11,13 @@ import type { dangoConfig } from "./lib/ipfs-client/dango-ipfs-ts/types/dango.ty
 
 const dangoRPCConfig:dangoConfig = {
     protocol: 'http',
-    host: '82.157.200.60',
-    port: '17501',
+    host: '111.119.239.159',
+    port: '12801',
 }
 
 const dangoGatewayConfig:dangoConfig = {
     protocol: 'http',
-    host: '82.157.200.60',
+    host: '111.119.239.159',
     port: '17801',
 }
 

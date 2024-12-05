@@ -70,7 +70,7 @@
                   <DropdownMenuItem @click="handleDownloadFile(file)">
                     下载文件
                   </DropdownMenuItem>
-                  <DropdownMenuItem @click="handleArchive(file)">
+                  <DropdownMenuItem @click="handleCopyCid(file)">
                     复制cid
                   </DropdownMenuItem>
                   <DropdownMenuSeparator v-if="file.status!='removed'"/>
@@ -115,6 +115,7 @@ import { CID, type KuboRPCClient } from 'kubo-rpc-client'
 import { toast } from 'vue-sonner'
 import { formatDate } from '@/lib/data-tools/dataFormer'
 import timeLaster from '@/lib/data-tools/timeLaster';
+import { Clipboard, AlertCircle, Download } from 'lucide-vue-next'
 
 
 // 定义常量
@@ -200,27 +201,77 @@ const toggleSelectAll = (checked: boolean) => {
   selectedFiles.value = checked ? [...files.value] : []
 }
 
-const handleDownloadFile = async(file: FileItem) => {
-  // Ensure file and cid are valid
-  isDownloading.value = true;
-  if (file.status!='active' || !file.cid) {
-    console.error('Invalid file or CID');
-    toast("下载失败", {
-      description: '无效的文件或 CID'
-    })
-    isDownloading.value = false;
+const handleCopyCid = (file: FileItem) => {
+  navigator.clipboard.writeText(file.cid)
+  
+  toast("复制成功", {
+    description: `文件 ${file.name} CID已复制到剪切板`,
+    style: {
+      background: 'linear-gradient(145deg, #6a11cb 0%, #2575fc 100%)',
+      color: 'white',
+      fontWeight: '600',
+      borderRadius: '16px',
+      padding: '16px 24px',
+      boxShadow: '0 8px 20px rgba(37, 117, 252, 0.3), 0 4px 10px rgba(106, 17, 203, 0.2)',
+      border: '1px solid rgba(255, 255, 255, 0.2)',
+      backdropFilter: 'blur(10px)',
+    },
+    icon: Clipboard,
+    duration: 2000,
+    position: 'bottom-center',
+  })
+}
+
+const handleDownloadFile = async (file: FileItem) => {
+  // 参数验证和初始状态设置
+  if (!file.status || file.status !== 'active' || !file.cid) {
+    toast('下载失败', {
+      description: '无效的文件或 CID',
+      icon: AlertCircle,
+      style: {
+        background: 'linear-gradient(145deg, #ff416c 0%, #ff4b2b 100%)',
+        color: 'white',
+        borderRadius: '16px',
+        padding: '16px 24px',
+      },
+      duration: 3000,
+      position: 'bottom-center'
+    });
     return;
   }
-  // const ipfs_url = `${IPFS_GATEWAY}/${file.cid}`
+
   try {
-    const fileContent = [];
-    for await (const chunk of ipfsClient.cat(CID.parse(file.cid))) {
-      fileContent.push(chunk);
-    }
-    // 将内容转换为 Blob
-    const blob = new Blob(fileContent, { type: 'application/octet-stream' });
-    isDownloading.value = false;
-    // 创建下载链接
+    // 使用响应式变量追踪下载进度
+    const downloadProgress = ref(0);
+
+    const fileContent: Uint8Array[] = [];
+    const downloadStream = ipfsClient.cat(CID.parse(file.cid));
+
+    // 设置超时机制
+    const downloadTimeout = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('下载超时')), 30000)
+    );
+
+    // 下载文件内容
+    await Promise.race([
+      (async () => {
+        for await (const chunk of downloadStream) {
+          fileContent.push(chunk);
+          // 计算下载进度
+          downloadProgress.value = Math.min(
+            (fileContent.reduce((acc, chunk) => acc + chunk.length, 0) / Number(file.size)) * 100, 
+            100
+          );
+        }
+      })(),
+      downloadTimeout
+    ]);
+
+    // 创建 Blob 并触发下载
+    const blob = new Blob(fileContent, { 
+      type: file.type || 'application/octet-stream' 
+    });
+
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -228,8 +279,42 @@ const handleDownloadFile = async(file: FileItem) => {
     document.body.appendChild(a);
     a.click();
 
-  }catch (error) {
-    console.log(error);
+    // 清理资源
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+
+    // 下载成功通知
+    toast('下载成功', {
+      description: `文件 ${file.name} 已成功下载`,
+      icon: Download,
+      style: {
+        background: 'linear-gradient(145deg, #56ab2f 0%, #a8e063 100%)',
+        color: 'white',
+        borderRadius: '16px',
+        padding: '16px 24px',
+      },
+      duration: 3000,
+      position: 'bottom-center'
+    });
+
+  } catch (error) {
+    // 错误处理
+    console.error('文件下载失败:', error);
+    
+    toast('下载失败', {
+      description: (error as Error).message || '无法下载文件',
+      icon: AlertCircle,
+      style: {
+        background: 'linear-gradient(145deg, #ff416c 0%, #ff4b2b 100%)',
+        color: 'white',
+        borderRadius: '16px',
+        padding: '16px 24px',
+      },
+      duration: 3000,
+      position: 'bottom-center'
+    });
+  } finally {
+    // 确保下载状态重置
     isDownloading.value = false;
   }
 }
@@ -332,6 +417,7 @@ onBeforeRouteUpdate(async(to, from, next) => {
 
 
 <style scoped lang="scss">
+
 .file-list-container {
   height: 100%;
   width: 100%;

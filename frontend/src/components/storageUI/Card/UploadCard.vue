@@ -49,6 +49,7 @@ import { SUBGRAPH_API } from '@/configs/SUBGRAPH_API';
 import { findFilesbyAddr } from '@/lib/contract-interact/graphSQL/temp/findFilesbyAddr';
 import { toast } from 'vue-sonner';
 import { formatDate } from '@/lib/data-tools/dataFormer'
+import { CheckCircle2 } from 'lucide-vue-next';
 
 const localStore = useLocalStorage();
 const {isConnected, address} = useWeb3ModalAccount();
@@ -151,6 +152,7 @@ const uploadFileHandler = async (file: File): Promise<FileItem> => {
 
     try {
         responseIPFS = await ipfsClient.add(file);
+        // console.log("草泥马的cid: ", responseIPFS.cid.toString())
     } catch (error) {
         console.log('IPFS upload error:', error);
         return {} as FileItem;
@@ -164,12 +166,37 @@ const uploadFileHandler = async (file: File): Promise<FileItem> => {
             fileType: file.type
         });
         toast('文件添加成功', {
-          description: `文件 ${file.name} 上传与 ${formatDate(file.lastModified)}`,
+          description: `文件 ${file.name} 上传于 ${formatDate(file.lastModified)}`,
+          style: {
+            background: 'linear-gradient(145deg, #00b4db 0%, #0083b0 100%)', // 蓝绿色渐变
+            color: 'white',
+            fontWeight: '600',
+            borderRadius: '16px',
+            padding: '16px 24px',
+            boxShadow: '0 8px 20px rgba(0, 180, 219, 0.3), 0 4px 10px rgba(0, 131, 176, 0.2)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            backdropFilter: 'blur(10px)',
+          },
           action: {
-            label: 'undo',
-            onClick: () => console.log('Undo')
-          }
-        })
+            label: '知悉',
+            onClick: () => {
+              console.log('Undo');
+              // 可以在这里添加具体的撤销逻辑
+            },
+            style: {
+              backgroundColor: 'rgba(255,255,255,0.2)',
+              color: 'white',
+              borderRadius: '8px',
+              padding: '6px 12px',
+              fontWeight: '600',
+              marginLeft: '12px',
+              transition: 'background-color 0.3s ease',
+            }
+          },
+          icon: CheckCircle2, // 使用勾选图标
+          duration: 4000, // 稍微延长显示时间
+          position: 'bottom-center'
+        });
     } catch (error) {
         console.log('Chain upload error:', error);
         // ipfs remove file
