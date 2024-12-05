@@ -35,7 +35,11 @@ const toggleTheme = () => {
 
   isDark.value = !isDark.value
   localStorage.setItem("theme", isDark.value ? "dark" : "light")
-  isDark.value ? document.body.classList.add("dark") : document.body.classList.remove("dark")
+  if (isDark.value) {
+    document.body.classList.add("dark");
+  } else {
+    document.body.classList.remove("dark");
+  }
 }
 
 const toggleAnimation = () => {
