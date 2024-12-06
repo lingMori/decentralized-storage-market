@@ -1,5 +1,6 @@
 <template>
-  <!-- <Button @click="clearCache">clear cache</Button> -->
+  <!-- a header outside the template -->
+  <FileBroadcast/>
   <BackCard :style="{ height: `calc(100vh - ${headerHeight}px)` }">
     <UploadCard></UploadCard>
     <SearchCard></SearchCard>
@@ -10,8 +11,10 @@
   import UploadCard from '@/components/storageUI/Card/UploadCard.vue';
   import BackCard from '@/components/storageUI/Card/BackCard.vue';
   import SearchCard from '@/components/storageUI/Card/SearchCard.vue';
+  import FileBroadcast from '@/components/storageUI/Header/FileBroadcast.vue';
 
   import { onMounted, ref, onUnmounted } from 'vue';
+  // import { File } from 'lucide-vue-next';
 
   const headerHeight = ref(0)
 

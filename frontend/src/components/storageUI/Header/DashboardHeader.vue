@@ -7,13 +7,9 @@
     <div class="header-menu">
       <nav class="header-navbar">
         <router-link :to="{ name: 'Upload' }" active-class="active" exact>Home</router-link>
-
         <router-link :to="{ name: 'Filebox' }" active-class="active" exact>File Box</router-link>
-
         <a href="https://github.com/lingMori" target="_blank" rel="noopener">Github</a>
-
-        <w3m-button style="margin: 0px 7px;" label="wallet connect"/>
-
+        <w3m-button style="margin: 0px 7px;" label="wallet connect" />
         <i :title="`Switch to ${isDark ? 'Light' : 'Dark'} Theme`">
           <i-mdi-brightness-7 v-if="isDark" class="icon-color" @click="toggleTheme" />
           <i-mdi-brightness-4 v-else class="icon-color" @click="toggleTheme" />
@@ -51,20 +47,26 @@ const toggleAnimation = () => {
   }
   element?.classList.add("animated");
 }
-
-
 </script>
 
 <style scoped lang="scss">
 #header {
+  position: fixed;   /* 使 header 固定在顶部 */
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;       /* 保证 header 在其他元素之上 */
+  
   display: flex;
   justify-content: space-between;
   align-items: center;
   
   transition: border-bottom 0.5s ease;
-
   padding: 1.3em 64px;
-  border-bottom: 1px solid rgb(243,244,246);
+  border-bottom: 0.5px solid rgb(243,244,246);
+
+  backdrop-filter: blur(8px);   /* 在 header 背后应用高斯模糊 */
+  -webkit-backdrop-filter: blur(8px); /* 支持 Safari */
 
   .header-title {
     h1 {
