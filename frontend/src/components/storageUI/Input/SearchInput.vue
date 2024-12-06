@@ -1,28 +1,29 @@
 <template>
-    <div class="search-wrapper">
-        <label for="search" class="icon icon-search">&#8203;</label>
-        <input type="text" id="search" class="search-input" :value="props.search" @input="emitsHandler" />
+  <div class="search-wrapper">
+    <label for="search" class="icon icon-search">&#8203;</label>
+    <input type="text" id="search" class="search-input" :value="props.search" @input="emitsHandler" />
 
-        <div class="search-count--label" :class="{show: (props.search !== '' && props.count > 0)}">{{ props.count }} founds</div>
+    <div class="search-count--label" :class="{ show: (props.search !== '' && props.count > 0) }">{{ props.count }} founds
     </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 
 const props = withDefaults(defineProps<{
-    search:string,
-    count: number
+  search: string,
+  count: number
 }>(), {
-    search: '',
-    count: 0
+  search: '',
+  count: 0
 });
 
 const emits = defineEmits<{
-    (e: 'onChanged', value: Event): void
+  (e: 'onChanged', value: Event): void
 }>()
 
 const emitsHandler = (event: Event) => {
-    emits('onChanged', event);
+  emits('onChanged', event);
 };
 
 </script>
@@ -39,7 +40,7 @@ const emitsHandler = (event: Event) => {
 
     position: absolute;
     margin-left: .8rem;
-  }  
+  }
 
   .search-input {
     width: 100%;

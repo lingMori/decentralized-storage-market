@@ -3,11 +3,8 @@
         <div class="sidebar-header">
             <div class="storage-info">
                 <h3 class="storage-title">存储空间</h3>
-                <Progress 
-                    :model-value="(props.user.usedStorage / props.user.totalStorage) * 100" 
-                    :is-loading="props.isLoading" 
-                    class="storage-progress" 
-                />
+                <Progress :model-value="(props.user.usedStorage / props.user.totalStorage) * 100"
+                    :is-loading="props.isLoading" class="storage-progress" />
                 <p class="storage-details">
                     已使用 {{ formatStorage(props.user.usedStorage) }} / {{ formatStorage(props.user.totalStorage) }}
                 </p>
@@ -18,30 +15,18 @@
             <div class="nav-section">
                 <h4 class="nav-title">存储位置</h4>
                 <div class="nav-items">
-                    <Button 
-                        variant="ghost" 
-                        class="nav-item"
-                        :class="{ active: currentView === 'all' }"
-                        @click="handleNavigation('all')"
-                    >
+                    <Button variant="ghost" class="nav-item" :class="{ active: currentView === 'all' }"
+                        @click="handleNavigation('all')">
                         <FolderIcon class="nav-icon" />
                         全部文件
                     </Button>
-                    <Button 
-                        variant="ghost" 
-                        class="nav-item"
-                        :class="{ active: currentView === 'recent' }"
-                        @click="handleNavigation('recent')"
-                    >
+                    <Button variant="ghost" class="nav-item" :class="{ active: currentView === 'recent' }"
+                        @click="handleNavigation('recent')">
                         <ClockIcon class="nav-icon" />
                         最近文件
                     </Button>
-                    <Button 
-                        variant="ghost" 
-                        class="nav-item"
-                        :class="{ active: currentView === 'starred' }"
-                        @click="handleNavigation('starred')"
-                    >
+                    <Button variant="ghost" class="nav-item" :class="{ active: currentView === 'starred' }"
+                        @click="handleNavigation('starred')">
                         <StarIcon class="nav-icon" />
                         已收藏
                     </Button>
@@ -51,14 +36,8 @@
             <div class="nav-section">
                 <h4 class="nav-title">文件类型</h4>
                 <div class="nav-items">
-                    <Button 
-                        v-for="type in fileTypes" 
-                        :key="type.id"
-                        variant="ghost" 
-                        class="nav-item"
-                        :class="{ active: currentView === type.id }"
-                        @click="handleNavigation(type.id)"
-                    >
+                    <Button v-for="type in fileTypes" :key="type.id" variant="ghost" class="nav-item"
+                        :class="{ active: currentView === type.id }" @click="handleNavigation(type.id)">
                         <component :is="type.icon" class="nav-icon" />
                         {{ type.name }}
                     </Button>
@@ -72,7 +51,7 @@
                 设置
             </Button>
         </div>
-        <StorageSettings ref="storageSettingsRef"/>
+        <StorageSettings ref="storageSettingsRef" />
     </div>
 </template>
 
@@ -80,15 +59,15 @@
 import { ref } from 'vue'
 import Button from '@/components/ui/button/Button.vue'
 import Progress from '@/components/ui/progress/Progress.vue';
-import { 
-    FolderIcon, 
-    ClockIcon, 
-    StarIcon, 
-    ImageIcon, 
-    FileTextIcon, 
+import {
+    FolderIcon,
+    ClockIcon,
+    StarIcon,
+    ImageIcon,
+    FileTextIcon,
     VideoIcon,
     MusicIcon,
-    SettingsIcon 
+    SettingsIcon
 } from 'lucide-vue-next'
 import { formatStorage } from '@/lib/data-tools/dataFormer';
 import router from '@/router';
@@ -161,7 +140,7 @@ const handleNavigation = (view: string) => {
 
         .storage-details {
             font-size: 0.875rem;
-            color: hsl( var(--muted-foreground));
+            color: hsl(var(--muted-foreground));
         }
     }
 }
@@ -195,7 +174,7 @@ const handleNavigation = (view: string) => {
                 padding: 0.5rem;
                 font-size: 0.875rem;
                 width: 100%;
-                
+
                 .nav-icon {
                     width: 1rem;
                     height: 1rem;
@@ -216,7 +195,7 @@ const handleNavigation = (view: string) => {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        
+
         .nav-icon {
             width: 1rem;
             height: 1rem;
@@ -231,7 +210,7 @@ const handleNavigation = (view: string) => {
         left: -240px;
         transition: left 0.3s ease;
         z-index: 50;
-        
+
         &.active {
             left: 0;
         }

@@ -1,6 +1,6 @@
 // router/index.ts
 import { createRouter, createWebHashHistory } from "vue-router";
-import type { Router, RouteRecordRaw, RouterOptions } from "vue-router";
+import type { RouteRecordRaw, RouterOptions } from "vue-router";
 
 const routes: RouteRecordRaw[] = [
     {
@@ -29,7 +29,7 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/',
         name: 'Home',
-        component: () => import("@/pages/Home.vue")
+        redirect: '/dashboard/upload'
     },
     // 添加通配符路由
     {

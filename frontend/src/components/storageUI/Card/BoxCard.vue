@@ -73,8 +73,8 @@
                   <DropdownMenuItem @click="handleCopyCid(file)">
                     复制cid
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator v-if="file.status!='removed'"/>
-                  <DropdownMenuItem v-if="file.status!='removed'" @click="handleDelete(file)" class="text-destructive">
+                  <DropdownMenuSeparator v-if="file.status != 'removed'" />
+                  <DropdownMenuItem v-if="file.status != 'removed'" @click="handleDelete(file)" class="text-destructive">
                     删除文件
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -203,7 +203,7 @@ const toggleSelectAll = (checked: boolean) => {
 
 const handleCopyCid = (file: FileItem) => {
   navigator.clipboard.writeText(file.cid)
-  
+
   toast("复制成功", {
     description: `文件 ${file.name} CID已复制到剪切板`,
     style: {
@@ -248,7 +248,7 @@ const handleDownloadFile = async (file: FileItem) => {
     const downloadStream = ipfsClient.cat(CID.parse(file.cid));
 
     // 设置超时机制
-    const downloadTimeout = new Promise((_, reject) => 
+    const downloadTimeout = new Promise((_, reject) =>
       setTimeout(() => reject(new Error('下载超时')), 30000)
     );
 
@@ -259,7 +259,7 @@ const handleDownloadFile = async (file: FileItem) => {
           fileContent.push(chunk);
           // 计算下载进度
           downloadProgress.value = Math.min(
-            (fileContent.reduce((acc, chunk) => acc + chunk.length, 0) / Number(file.size)) * 100, 
+            (fileContent.reduce((acc, chunk) => acc + chunk.length, 0) / Number(file.size)) * 100,
             100
           );
         }
@@ -268,8 +268,8 @@ const handleDownloadFile = async (file: FileItem) => {
     ]);
 
     // 创建 Blob 并触发下载
-    const blob = new Blob(fileContent, { 
-      type: file.type || 'application/octet-stream' 
+    const blob = new Blob(fileContent, {
+      type: file.type || 'application/octet-stream'
     });
 
     const url = window.URL.createObjectURL(blob);
@@ -300,7 +300,7 @@ const handleDownloadFile = async (file: FileItem) => {
   } catch (error) {
     // 错误处理
     console.error('文件下载失败:', error);
-    
+
     toast('下载失败', {
       description: (error as Error).message || '无法下载文件',
       icon: AlertCircle,
@@ -404,7 +404,7 @@ onUnmounted(() => {
   window.removeEventListener('resize', handleWindowResize)
 })
 
-onBeforeRouteUpdate(async(to, from, next) => {
+onBeforeRouteUpdate(async (to, from, next) => {
   if (to.query.view !== from.query.view) {
     isDownloading.value = true;
     await timeLaster(300)
@@ -417,7 +417,6 @@ onBeforeRouteUpdate(async(to, from, next) => {
 
 
 <style scoped lang="scss">
-
 .file-list-container {
   height: 100%;
   width: 100%;

@@ -1,4 +1,3 @@
-
 <template>
   <Dialog :open="isSettingsOpen" @update:open="toggleSettings">
     <DialogContent class="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
@@ -8,7 +7,7 @@
           管理您的存储空间和偏好设置
         </DialogDescription>
       </DialogHeader>
-      
+
       <div class="grid gap-4 py-4">
         <div class="grid grid-cols-4 items-center gap-4">
           <Label class="text-right">存储限额</Label>
@@ -24,9 +23,9 @@
             </SelectContent>
           </Select>
         </div>
-        
+
         <Separator />
-        
+
         <div class="grid grid-cols-4 items-center gap-4">
           <Label class="text-right">文件保留策略</Label>
           <Select v-model="fileRetentionPolicy">
@@ -41,74 +40,54 @@
             </SelectContent>
           </Select>
         </div>
-        
+
         <Separator />
-        
+
         <div class="grid grid-cols-4 items-center gap-4">
           <Label class="text-right">自动归档</Label>
-          <Switch 
-            :checked="autoArchiveEnabled" 
-            @update:checked="toggleAutoArchive"
-            class="col-span-3"
-          />
+          <Switch :checked="autoArchiveEnabled" @update:checked="toggleAutoArchive" class="col-span-3" />
           <div v-if="autoArchiveEnabled" class="col-span-4 ">
-          <div class="grid grid-cols-4 items-center gap-4">
-            <Label class="text-right">归档阈值</Label>
-            <Select v-model="archiveThreshold">
-              <SelectTrigger class="col-span-3">
-                <SelectValue placeholder="选择归档阈值" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="50">50% 存储空间</SelectItem>
-                <SelectItem value="75">75% 存储空间</SelectItem>
-                <SelectItem value="90">90% 存储空间</SelectItem>
-              </SelectContent>
-            </Select>
+            <div class="grid grid-cols-4 items-center gap-4">
+              <Label class="text-right">归档阈值</Label>
+              <Select v-model="archiveThreshold">
+                <SelectTrigger class="col-span-3">
+                  <SelectValue placeholder="选择归档阈值" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="50">50% 存储空间</SelectItem>
+                  <SelectItem value="75">75% 存储空间</SelectItem>
+                  <SelectItem value="90">90% 存储空间</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
-        </div>
-        
+
         <Separator />
-        
+
         <div class="grid grid-cols-4 items-center gap-4">
           <Label class="text-right">安全设置</Label>
           <div class="col-span-3 space-y-2">
             <div class="flex items-center space-x-2">
-              <Checkbox 
-                id="encryption" 
-                :checked="encryptionEnabled"
-                @update:checked="toggleEncryption"
-              />
-              <Label 
-                for="encryption"
-                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
+              <Checkbox id="encryption" :checked="encryptionEnabled" @update:checked="toggleEncryption" />
+              <Label for="encryption"
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 启用文件加密
               </Label>
             </div>
             <div class="flex items-center space-x-2">
-              <Checkbox 
-                id="two-factor" 
-                :checked="twoFactorEnabled"
-                @update:checked="toggleTwoFactor"
-              />
-              <Label 
-                for="two-factor"
-                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
+              <Checkbox id="two-factor" :checked="twoFactorEnabled" @update:checked="toggleTwoFactor" />
+              <Label for="two-factor"
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 启用双重认证
               </Label>
             </div>
           </div>
         </div>
       </div>
-      
+
       <DialogFooter>
-        <Button 
-          type="submit" 
-          @click="saveSettings"
-          :disabled="!hasChanges"
-        >
+        <Button type="submit" @click="saveSettings" :disabled="!hasChanges">
           保存设置
         </Button>
       </DialogFooter>
@@ -118,13 +97,13 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogFooter, 
-  DialogHeader, 
-  DialogTitle 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'

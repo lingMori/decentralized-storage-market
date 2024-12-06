@@ -1,6 +1,7 @@
 <template>
   <div class="min-h-screen flex">
-    <div class="container relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
+    <div
+      class="container relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
       <!-- Left Column - Brand Section -->
       <div class="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
         <div class="absolute inset-0 bg-zinc-900" />
@@ -68,31 +69,19 @@
               <!-- Step 1: Wallet Connection -->
               <div v-if="currentStep === 1" class="space-y-4">
                 <div class="grid gap-4">
-                  <Button 
-                    class="w-full h-12 bg-orange-600 hover:bg-orange-700 text-white"
-                    @click="handleConnectWallet"
-                    :disabled="isLoading"
-                  >
+                  <Button class="w-full h-12 bg-orange-600 hover:bg-orange-700 text-white" @click="handleConnectWallet"
+                    :disabled="isLoading">
                     <Wallet class="mr-2 h-5 w-5" />
                     {{ isLoading ? '连接中...' : '连接 MetaMask' }}
                   </Button>
-                  <Button 
-                    class="w-full h-12" 
-                    variant="outline"
-                    :disabled="isLoading"
-                  >
+                  <Button class="w-full h-12" variant="outline" :disabled="isLoading">
                     <Globe class="mr-2 h-5 w-5" />
                     连接 WalletConnect
                   </Button>
                   <Separator class="my-4" />
                   <div class="grid gap-4">
-                    <Button 
-                      v-for="platform in socialPlatforms"
-                      :key="platform.id"
-                      class="w-full h-12" 
-                      variant="outline"
-                      @click="() => handleSocialLogin(platform.id)"
-                    >
+                    <Button v-for="platform in socialPlatforms" :key="platform.id" class="w-full h-12" variant="outline"
+                      @click="() => handleSocialLogin(platform.id)">
                       <component :is="platform.icon" class="mr-2 h-5 w-5" />
                       {{ platform.name }}登录
                     </Button>
@@ -104,19 +93,11 @@
               <div v-if="currentStep === 2" class="space-y-4">
                 <div class="space-y-2">
                   <Label>用户名</Label>
-                  <Input
-                    type="text"
-                    v-model="userDetails.username"
-                    placeholder="请输入用户名"
-                  />
+                  <Input type="text" v-model="userDetails.username" placeholder="请输入用户名" />
                 </div>
                 <div class="space-y-2">
                   <Label>电子邮箱</Label>
-                  <Input
-                    type="email"
-                    v-model="userDetails.email"
-                    placeholder="请输入电子邮箱"
-                  />
+                  <Input type="email" v-model="userDetails.email" placeholder="请输入电子邮箱" />
                 </div>
               </div>
 
@@ -131,12 +112,7 @@
                 </Alert>
                 <div class="space-y-2">
                   <Label>验证码</Label>
-                  <Input
-                    type="text"
-                    v-model="verificationCode"
-                    placeholder="请输入6位验证码"
-                    maxlength="6"
-                  />
+                  <Input type="text" v-model="verificationCode" placeholder="请输入6位验证码" maxlength="6" />
                 </div>
               </div>
 
@@ -146,17 +122,10 @@
 
               <!-- Navigation Buttons -->
               <div class="flex justify-between">
-                <Button
-                  variant="outline"
-                  @click="handleBack"
-                  :disabled="currentStep === 1 || isLoading"
-                >
+                <Button variant="outline" @click="handleBack" :disabled="currentStep === 1 || isLoading">
                   返回
                 </Button>
-                <Button
-                  @click="handleNext"
-                  :disabled="isLoading"
-                >
+                <Button @click="handleNext" :disabled="isLoading">
                   {{ currentStep === 3 ? '完成注册' : '下一步' }}
                   <ChevronRight class="ml-2 h-4 w-4" />
                 </Button>
@@ -270,8 +239,8 @@ const handleConnectWallet = async () => {
   try {
     isLoading.value = true
     await open()
-    
-    const connectTimeout = new Promise((_, reject) => 
+
+    const connectTimeout = new Promise((_, reject) =>
       setTimeout(() => reject(new Error('连接钱包超时')), 30000)
     )
 
@@ -310,7 +279,7 @@ const handleSocialLogin = (platform: string) => {
 const handleRegister = async () => {
   registrationError.value = null
   isLoading.value = true
-  
+
   try {
     const signer = getSigner()
     const address = await signer.getAddress()

@@ -1,21 +1,12 @@
 <template>
   <div class="file-broadcast-container">
     <div ref="broadcastWrapper" class="broadcast-wrapper">
-      <div 
-        ref="broadcastContent" 
-        class="broadcast-content inline-flex items-center p-0.5"
-      >
-        <div 
-          v-for="(file, index) in infiniteFiles"
-          :key="`${file.cid}-${index}`"
-          class="file-item group mr-4 flex items-center"
-        >
-          <div 
-            class="file-unit flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-blue-500 backdrop-blur-sm rounded-full border border-transparent px-2 py-0.5"
-          >
-            <FileIcon 
-              class="w-4 h-4 text-white group-hover:text-blue-200 transition-colors" 
-            />
+      <div ref="broadcastContent" class="broadcast-content inline-flex items-center p-0.5">
+        <div v-for="(file, index) in infiniteFiles" :key="`${file.cid}-${index}`"
+          class="file-item group mr-4 flex items-center">
+          <div
+            class="file-unit flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-blue-500 backdrop-blur-sm rounded-full border border-transparent px-2 py-0.5">
+            <FileIcon class="w-4 h-4 text-white group-hover:text-blue-200 transition-colors" />
             <span class="file-name font-medium text-white group-hover:text-blue-200 transition-colors truncate">
               {{ truncateFileName(file.fileName) }}
             </span>
@@ -48,7 +39,7 @@ const fetchRecentFiles = async () => {
   try {
     const graphqlClient = await createGraphqlClient(SUBGRAPH_API, findFilesbyAddr(address.value))
     const result = await graphqlClient as { files: GraphQLFile[] }
-    
+
     recentFiles.value = result.files
       .sort((a, b) => Number(b.lastUpdated) - Number(a.lastUpdated))
       .slice(0, 10)
@@ -63,7 +54,7 @@ const infiniteFiles = computed(() => {
 })
 
 const truncateFileName = (name: string, maxLength = 30) => {
-  return name.length > maxLength 
+  return name.length > maxLength
     ? `${name.slice(0, maxLength)}...`
     : name
 }
@@ -77,7 +68,7 @@ const setupAnimation = () => {
 
     // Measure the total width of content
     const contentWidth = broadcastContent.value.scrollWidth / 3
-    
+
     scrollTween = gsap.to(broadcastContent.value, {
       x: `-${contentWidth}px`,
       duration: animationDuration.value,

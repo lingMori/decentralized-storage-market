@@ -10,7 +10,6 @@
 </template>
 
 <script setup lang="ts">
-import RegisterDialog from '@/components/storageUI/Dialog/RegisterDialog.vue';
 import SwitchServerLoading from '@/components/storageUI/Loading/SwitchServerLoading.vue';
 import RegisterDialogV2 from '@/components/storageUI/Dialog/RegisterDialogV2.vue';
 import { onMounted, ref, watch } from 'vue';

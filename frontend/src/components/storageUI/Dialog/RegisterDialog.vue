@@ -1,6 +1,6 @@
 <template>
   <Dialog :open="!isLoggedIn" @update:open="(val) => updateLoginStatus(!val)">
-    <DialogContent v-on:interact-outside="(e: Event) => {e.preventDefault();}">
+    <DialogContent v-on:interact-outside="(e: Event) => { e.preventDefault(); }">
       <Card class="w-full max-w-md mx-auto border-0 shadow-none">
         <CardHeader>
           <CardTitle class="text-2xl font-bold text-center">欢迎来到 InstaShare</CardTitle>
@@ -14,60 +14,37 @@
               <TabsTrigger value="wallet">Web3 钱包</TabsTrigger>
               <TabsTrigger value="social">社交账号</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="wallet" class="space-y-4">
               <div class="grid gap-4 mt-4">
-                <Button 
-                  class="w-full h-12 bg-orange-600 hover:bg-orange-600 text-white border-none transition-all duration-300 group relative overflow-hidden" 
-                  variant="outline" 
-                  @click="connectWallet"
-                  :disabled="isLoading"
-                >
+                <Button
+                  class="w-full h-12 bg-orange-600 hover:bg-orange-600 text-white border-none transition-all duration-300 group relative overflow-hidden"
+                  variant="outline" @click="connectWallet" :disabled="isLoading">
                   <Wallet class="mr-2 h-5 w-5" />
                   {{ isLoading ? '连接中...' : '连接 MetaMask' }}
                 </Button>
-                <Button 
-                  class="w-full h-12" 
-                  variant="outline"
-                  :disabled="isLoading"
-                >
+                <Button class="w-full h-12" variant="outline" :disabled="isLoading">
                   <Globe class="mr-2 h-5 w-5" />
                   连接 WalletConnect
                 </Button>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="social" class="space-y-4">
               <div class="grid gap-4 mt-4">
-                <Button 
-                  class="w-full h-12" 
-                  variant="outline"
-                  @click="() => socialLogin('email')"
-                >
+                <Button class="w-full h-12" variant="outline" @click="() => socialLogin('email')">
                   <Mail class="mr-2 h-5 w-5" />
                   邮箱登录
                 </Button>
-                <Button 
-                  class="w-full h-12" 
-                  variant="outline"
-                  @click="() => socialLogin('google')"
-                >
+                <Button class="w-full h-12" variant="outline" @click="() => socialLogin('google')">
                   <Globe class="mr-2 h-5 w-5" />
                   Google 登录
                 </Button>
-                <Button 
-                  class="w-full h-12" 
-                  variant="outline"
-                  @click="() => socialLogin('apple')"
-                >
+                <Button class="w-full h-12" variant="outline" @click="() => socialLogin('apple')">
                   <Laptop class="mr-2 h-5 w-5" />
                   Apple 登录
                 </Button>
-                <Button 
-                  class="w-full h-12" 
-                  variant="outline"
-                  @click="() => socialLogin('github')"
-                >
+                <Button class="w-full h-12" variant="outline" @click="() => socialLogin('github')">
                   <GithubIcon class="mr-2 h-5 w-5" />
                   Github 登录
                 </Button>
@@ -86,12 +63,7 @@
             </div>
           </div>
 
-          <Button 
-            class="w-full" 
-            variant="default"
-            @click="registerInsta"
-            :disabled="isLoading"
-          >
+          <Button class="w-full" variant="default" @click="registerInsta" :disabled="isLoading">
             {{ isLoading ? '注册中...' : '现在加入InstaShare网络' }}
           </Button>
 
@@ -104,7 +76,7 @@
     </DialogContent>
   </Dialog>
 </template>
-  
+
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
@@ -163,7 +135,7 @@ const connectWallet = async () => {
             router.push('/dashboard/upload');
 
             updateLoginStatus(true);
-            
+
             clearInterval(timer);
             resolve();
           }
@@ -183,7 +155,7 @@ const connectWallet = async () => {
 const registerInsta = async () => {
   // 重置错误状态
   registrationError.value = null
-  
+
   try {
     // 设置加载状态
     isLoading.value = true
