@@ -42,7 +42,7 @@ const fetchRecentFiles = async () => {
 
     recentFiles.value = result.files
       .sort((a, b) => Number(b.lastUpdated) - Number(a.lastUpdated))
-      .slice(0, 10)
+      .slice(0, 4)
   } catch (error) {
     console.error('Error fetching recent files:', error)
   }

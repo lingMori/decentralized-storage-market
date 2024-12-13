@@ -1,4 +1,4 @@
-import { fileURLToPath, URL } from 'node:url'
+// import { fileURLToPath, URL } from 'node:url'
 import path from 'node:path'
 
 import { defineConfig } from 'vite'
@@ -12,6 +12,7 @@ import IconResolver from 'unplugin-icons/resolver'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/group-storage',
   plugins: [
     vue(),
     Icons(),

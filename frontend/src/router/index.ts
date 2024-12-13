@@ -18,6 +18,11 @@ const routes: RouteRecordRaw[] = [
                 path: 'filebox',
                 name: 'Filebox',
                 component: () => import("@/pages/dashboard/Filebox.vue")
+            },
+            {
+                path: 'public',
+                name: 'Public',
+                component: () => import("@/pages/dashboard/Public.vue")
             }
         ]
     },

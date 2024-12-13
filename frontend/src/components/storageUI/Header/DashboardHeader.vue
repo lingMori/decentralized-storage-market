@@ -8,7 +8,8 @@
       <nav class="header-navbar">
         <router-link :to="{ name: 'Upload' }" active-class="active" exact>Home</router-link>
         <router-link :to="{ name: 'Filebox' }" active-class="active" exact>File Box</router-link>
-        <a href="https://github.com/lingMori" target="_blank" rel="noopener">Github</a>
+        <router-link :to="{ name: 'Public' }" active-class="active">Public</router-link>
+        <!-- <a href="https://github.com/lingMori" target="_blank" rel="noopener">Github</a> -->
         <w3m-button style="margin: 0px 7px;" label="wallet connect" />
         <i :title="`Switch to ${isDark ? 'Light' : 'Dark'} Theme`">
           <i-mdi-brightness-7 v-if="isDark" class="icon-color" @click="toggleTheme" />

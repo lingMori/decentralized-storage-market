@@ -5,6 +5,8 @@
     <UploadCard></UploadCard>
     <SearchCard></SearchCard>
   </BackCard>
+  <IpfsStateCard/>
+  <IpfsStateChar />
 </template>
 
 <script setup lang="ts">
@@ -12,6 +14,8 @@ import UploadCard from '@/components/storageUI/Card/UploadCard.vue';
 import BackCard from '@/components/storageUI/Card/BackCard.vue';
 import SearchCard from '@/components/storageUI/Card/SearchCard.vue';
 import FileBroadcast from '@/components/storageUI/Header/FileBroadcast.vue';
+import IpfsStateCard from '@/components/storageUI/Card/IpfsStateCard.vue';
+import IpfsStateChar from '@/components/storageUI/Chart/IpfsStateChar.vue';
 
 import { onMounted, ref, onUnmounted } from 'vue';
 // import { File } from 'lucide-vue-next';

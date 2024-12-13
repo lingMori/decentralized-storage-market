@@ -1,6 +1,6 @@
 // web3ModalConfig.ts
 import { createWeb3Modal, defaultConfig } from '@web3modal/ethers5/vue';
-import { ref } from 'vue';
+// import { ref } from 'vue';
 // 1. Get projectId at https://cloud.walletconnect.com
 const projectId = '922f050d93e9689768bf36aac1212c06'
 
