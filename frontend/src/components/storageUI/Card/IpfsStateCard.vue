@@ -1,101 +1,125 @@
 <template>
-  <Card class="w-full max-w-4xl mx-auto">
-    <CardHeader>
-      <CardTitle class="flex items-center justify-between">
-        <span>IPFS Node Status</span>
-        <Badge :variant="nodeStatus === 'online' ? 'default' : 'destructive'">
-          {{ nodeStatus.toUpperCase() }}
+  <Card class="w-full max-w-7xl mx-auto shadow-lg border ">
+    <CardHeader class="border-b ">
+      <CardTitle class="flex items-center justify-between ">
+        <div class="flex items-center space-x-3">
+          <CloudCogIcon class="w-6 h-6 text-emerald-600" />
+          <span class="font-semibold">IPFS Node Status</span>
+        </div>
+        <Badge :variant="nodeStatus === 'online' ? 'default' : 'destructive'" class="flex items-center space-x-2">
+          <CheckCircle2Icon v-if="nodeStatus === 'online'" class="w-4 h-4 text-emerald-500" />
+          <XCircleIcon v-else class="w-4 h-4 text-red-500" />
+          <span>{{ nodeStatus.toUpperCase() }}</span>
         </Badge>
       </CardTitle>
     </CardHeader>
-    <CardContent>
-      <div class="grid grid-cols-2 gap-4">
+    <CardContent class="p-6">
+      <div class="grid grid-cols-2 gap-6">
         <!-- Node Information Card -->
-        <Card>
-          <CardHeader>
-            <CardTitle>Node Information</CardTitle>
+        <Card class=" shadow-md border ">
+          <CardHeader class="border-b ">
+            <CardTitle class="flex items-center space-x-3 ">
+              <HardDriveIcon class="w-5 h-5 text-indigo-600" />
+              <span class="font-semibold">Node Information</span>
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div class="space-y-2">
-              <div class="flex justify-between truncate">
-                <span class="font-medium">Peer ID:</span>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <code class="text-sm max-w-[10px]">
-                        {{ nodeInfo.peerId }}
-                      </code>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Full Peer ID</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-              <div class="flex justify-between">
-                <span>Version:</span>
-                <span>{{ nodeInfo.version }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Repository Size:</span>
-                <span>{{ formatBytes(nodeInfo.repoSize) }}</span>
-              </div>
+          <CardContent class="space-y-3 py-4">
+            <div class="flex justify-between items-center">
+              <span class="font-medium text-gray-600">Peer ID:</span>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <code class="text-sm bg-gray-100 px-2 py-1 rounded-md truncate max-w-[150px] text-gray-800 overflow-hidden whitespace-nowrap text-ellipsis">
+                      {{ nodeInfo.peerId }}
+                    </code>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Full Peer ID</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600">Version:</span>
+              <span class="font-semibold text-gray-800">{{ nodeInfo.version }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600">Repository Size:</span>
+              <span class="font-semibold text-gray-800">{{ formatBytes(nodeInfo.repoSize) }}</span>
             </div>
           </CardContent>
         </Card>
 
         <!-- Network Statistics Card -->
-        <Card>
-          <CardHeader>
-            <CardTitle>Network Statistics</CardTitle>
+        <Card class=" shadow-md border ">
+          <CardHeader class="border-b ">
+            <CardTitle class="flex items-center space-x-3 ">
+              <ServerIcon class="w-5 h-5 text-cyan-600" />
+              <span class="font-semibold">Network Statistics</span>
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div class="space-y-2">
-              <div class="flex justify-between">
-                <span>Connected Peers:</span>
-                <span>{{ networkStats.connectedPeers }}</span>
-              </div>
-              <div class="flex justify-between truncate">
-                <span>Total Bw:</span>
-                <span>
+          <CardContent class="space-y-3 py-4">
+            <div class="flex justify-between items-center">
+              <span class="">Connected Peers:</span>
+              <span class="font-semibold ">{{ networkStats.connectedPeers }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="">Total Bandwidth:</span>
+              <div class="flex items-center space-x-2">
+                <ArrowUpDownIcon class="w-4 h-4 text-purple-500" />
+                <span class="">
                   ↑ {{ formatBytes(networkStats.bandwidthUp) }}/s
                   ↓ {{ formatBytes(networkStats.bandwidthDown) }}/s
                 </span>
               </div>
-              <div class="flex justify-between">
-                <span>Bitswap Efficiency:</span>
-                <Progress 
-                  :model-value=" networkStats.bitswapEfficiency * 100" 
-                  class="h-2"
-                />
-              </div>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="">Bitswap Efficiency:</span>
+              <Progress 
+                :model-value="networkStats.bitswapEfficiency * 100" 
+                class="h-2 w-[200px] bg-gray-200"
+              />
             </div>
           </CardContent>
         </Card>
       </div>
-
-      <!-- use chart under to design cards -->
-      
+      <div style="padding-top: 5px;">
+        <Card class=" shadow-md border ">
+          <CardHeader class="border-b ">
+            <CardTitle class="flex items-center space-x-3 ">
+              <HardDriveIcon class="w-5 h-5 text-indigo-600" />
+              <span class="font-semibold">Node bindwith intime</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <IpfsStateChar />
+          </CardContent>
+        </Card>
+      </div>
     </CardContent>
   </Card>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import {Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import Badge from '@/components/ui/badge/Badge.vue'
-import Progress from '@/components/ui/progress/Progress.vue'
-import { Tooltip,TooltipContent,TooltipProvider,TooltipTrigger} from '@/components/ui/tooltip'
+import { 
+  HardDrive as HardDriveIcon, 
+  CloudCog as CloudCogIcon, 
+  Server as ServerIcon, 
+  ArrowUpDown as ArrowUpDownIcon,
+  CheckCircle2 as CheckCircle2Icon, 
+  XCircle as XCircleIcon 
+} from 'lucide-vue-next'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { inject } from 'vue'
 import type { KuboRPCClient } from 'kubo-rpc-client'
-import { createGraphqlClient } from '@/lib/contract-interact/graphSQL/client/graphqlClient'
-import { SUBGRAPH_API } from '@/configs/SUBGRAPH_API'
-import { useWeb3ModalAccount } from '@web3modal/ethers5/vue'
-import { findFilesbyAddr } from '@/lib/contract-interact/graphSQL/temp/findFilesbyAddr'
-import type { File as GraphQLFile } from '@/lib/contract-interact/graphSQL/types/types'
+import IpfsStateChar from '../Chart/IpfsStateChar.vue'
+
 // IPFS client configuration
-const ipfsClient = inject('dangoRPC') as KuboRPCClient;
-const {address} = useWeb3ModalAccount();
+const ipfsClient = inject('dangoRPC') as KuboRPCClient
 
 // Reactive state variables
 const nodeStatus = ref('offline')
@@ -110,9 +134,8 @@ const networkStats = ref({
   bandwidthDown: 0,
   bitswapEfficiency: 0
 })
-const pinnedContent = ref<GraphQLFile[]>([])
 
-// Utility functions
+// Utility function to format bytes
 const formatBytes = (bytes: number) => {
   const units = ['B', 'KB', 'MB', 'GB', 'TB']
   let size = bytes
@@ -126,45 +149,43 @@ const formatBytes = (bytes: number) => {
   return `${size.toFixed(2)} ${units[unitIndex]}`
 }
 
-const fetchRecentFiles = async () => {
-  try {
-    const graphqlClient = await createGraphqlClient(SUBGRAPH_API, findFilesbyAddr(address.value))
-    const result = await graphqlClient as { files: GraphQLFile[] }
-
-    pinnedContent.value = result.files
-      .sort((a, b) => Number(b.lastUpdated) - Number(a.lastUpdated))
-      .slice(0, 4)
-  } catch (error) {
-    console.error('Error fetching recent files:', error)
-  }
-}
-
+// Fetch node information
 // Fetch node information
 const updateNodeInfo = async () => {
   try {
-
-    const [id, version] = await Promise.all([
+    // Fetch node information concurrently
+    const [id, version, repoStats] = await Promise.all([
       ipfsClient.id(),
-      ipfsClient.version()
+      ipfsClient.version(),
+      ipfsClient.stats.repo()
     ])
 
+    // Fetch connected peers
+    const peers = await ipfsClient.swarm.peers()
+
+    // Start processing bandwidth stats as an AsyncIterable
+    const bandwidthStats = ipfsClient.stats.bw()
+
+    // Process streaming data from bandwidth stats
+    for await (const stats of bandwidthStats) {
+      // Update network statistics in real-time
+      networkStats.value = {
+        connectedPeers: peers.length,
+        bandwidthDown: Number(stats.totalIn), // Outgoing bandwidth
+        bandwidthUp: Number(stats.totalOut),   // Incoming bandwidth
+        bitswapEfficiency: Number(
+          1 / (Number(stats.totalIn) / (Number(stats.totalOut) || 1))
+        )
+      }
+    }
+
+    // Update node status and information after processing bandwidth stats
     nodeStatus.value = 'online'
     nodeInfo.value = {
       peerId: id.id.toString(),
       version: version.version,
-      repoSize: Number((await ipfsClient.stats.repo()).repoSize)
+      repoSize: Number(repoStats.repoSize)
     }
-
-    for await (const stats of ipfsClient.stats.bw()) {
-      networkStats.value = {
-        connectedPeers: (await ipfsClient.swarm.peers()).length,
-        bandwidthDown: Number(stats.rateOut),
-        bandwidthUp: Number(stats.rateIn),
-        bitswapEfficiency:  Number(stats.totalIn / stats.totalOut)
-      }
-    }
-
-    
   } catch (error) {
     console.error('Failed to fetch IPFS node info:', error)
     nodeStatus.value = 'offline'
@@ -174,10 +195,9 @@ const updateNodeInfo = async () => {
 // Periodic updates
 let intervalId: ReturnType<typeof setInterval>
 
-onMounted(async() => {
-  updateNodeInfo()
-  await fetchRecentFiles()
-  intervalId = setInterval(updateNodeInfo, 30000) // Update every 30 seconds
+onMounted(async () => {
+  await updateNodeInfo()
+  intervalId = setInterval(updateNodeInfo, 1000) // Update every 30 seconds
 })
 
 onUnmounted(() => {
@@ -189,14 +209,6 @@ onUnmounted(() => {
 .truncate {
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.overflow-hidden {
-  overflow: hidden;
-}
-
-.text-ellipsis {
   text-overflow: ellipsis;
 }
 </style>

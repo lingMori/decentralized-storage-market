@@ -102,7 +102,6 @@ import { accountRepo } from '@/lib/contract-interact/accountRepp'
 import { toast } from 'vue-sonner'
 import router from '@/router'
 import { AlertCircle } from 'lucide-vue-next'
-import { error } from 'console'
 
 interface SocialPlatform {
   id: string
@@ -203,12 +202,10 @@ const handleRegister = async () => {
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : '未知错误'
-    registrationError.value = errorMessage
-    toast({
-      title: "注册失败",
-      description: errorMessage,
-      variant: "destructive"
-    })
+    if (errorMessage.includes('unknown account')) {
+      registrationError.value = '请先登陆metamask'
+    }
+    // registrationError.value = errorMessage
   } finally {
     isLoading.value = false
   }
