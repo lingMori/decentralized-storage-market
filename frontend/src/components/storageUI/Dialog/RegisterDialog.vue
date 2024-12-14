@@ -23,7 +23,7 @@
                   <Wallet class="mr-2 h-5 w-5" />
                   {{ isLoading ? '连接中...' : '连接 MetaMask' }}
                 </Button>
-                <Button class="w-full h-12" variant="outline" :disabled="isLoading">
+                <Button disabled class="w-full h-12" variant="outline">
                   <Globe class="mr-2 h-5 w-5" />
                   连接 WalletConnect
                 </Button>
@@ -32,19 +32,19 @@
 
             <TabsContent value="social" class="space-y-4">
               <div class="grid gap-4 mt-4">
-                <Button class="w-full h-12" variant="outline" @click="() => socialLogin('email')">
+                <Button disabled class="w-full h-12" variant="outline" @click="() => socialLogin('email')">
                   <Mail class="mr-2 h-5 w-5" />
                   邮箱登录
                 </Button>
-                <Button class="w-full h-12" variant="outline" @click="() => socialLogin('google')">
+                <Button disabled class="w-full h-12" variant="outline" @click="() => socialLogin('google')">
                   <Globe class="mr-2 h-5 w-5" />
                   Google 登录
                 </Button>
-                <Button class="w-full h-12" variant="outline" @click="() => socialLogin('apple')">
+                <Button disabled class="w-full h-12" variant="outline" @click="() => socialLogin('apple')">
                   <Laptop class="mr-2 h-5 w-5" />
                   Apple 登录
                 </Button>
-                <Button class="w-full h-12" variant="outline" @click="() => socialLogin('github')">
+                <Button disabled class="w-full h-12" variant="outline" @click="() => socialLogin('github')">
                   <GithubIcon class="mr-2 h-5 w-5" />
                   Github 登录
                 </Button>
@@ -102,7 +102,8 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  'update:isLoggedIn': [value: boolean]
+  'update:isLoggedIn': [value: boolean],
+  'update:isRegisted': [value: boolean]
 }>()
 
 const { toast } = useToast()
@@ -119,14 +120,13 @@ const updateLoginStatus = (value: boolean) => {
   emit('update:isLoggedIn', value)
 }
 
+const updateRegisterStatus = (value: boolean) => {
+  emit('update:isRegisted', value)
+}
+
 const connectWallet = async () => {
   try {
     await open()
-    // 添加超时和重试机制
-    // const connectTimeout = new Promise((_, reject) => 
-    //   setTimeout(() => reject(new Error('连接钱包超时')), 30000)
-    // ) // Added closing parenthesis here
-
     await Promise.race([
       new Promise<void>(resolve => {
         const timer = setInterval(() => {
@@ -136,6 +136,29 @@ const connectWallet = async () => {
 
             updateLoginStatus(true);
 
+            clearInterval(timer);
+            resolve();
+          }
+        }, 500);
+      })
+    ]);
+  } catch (error) {
+    toast({
+      title: "钱包连接失败",
+      description: error instanceof Error ? error.message : "未知错误",
+      variant: "destructive"
+    })
+    throw error
+  }
+}
+
+const connectMetamask = async() => {
+  try {
+    await open()
+    await Promise.race([
+      new Promise<void>(resolve => {
+        const timer = setInterval(() => {
+          if (isConnected.value) {
             clearInterval(timer);
             resolve();
           }

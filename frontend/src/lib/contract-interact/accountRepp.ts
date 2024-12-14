@@ -14,10 +14,13 @@ export const accountRepo = (): {
             await tx.wait();
             return { success: true };
         } catch (error: any) {
-            if (error.code === 4001) { // 直接检查 error.code
+            console.log(error)
+            if (error.code === 'ACTION_REJECTED' || 
+                error.action === 'sendTransaction' || 
+                error.message.includes('user rejected transaction')) { // 直接检查 error.code
                 return { success: false, error: '用户拒绝了交易' };
             }
-            if (error.message.includes('AlreadyRegistered')) {
+            if (error.error.code === 3) {
                 return { success: false, error: '该地址已经注册' };
             }
             return { success: false, error: '注册失败，请稍后重试' };

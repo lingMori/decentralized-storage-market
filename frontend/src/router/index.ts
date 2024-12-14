@@ -1,6 +1,8 @@
-// router/index.ts
 import { createRouter, createWebHashHistory } from "vue-router";
 import type { RouteRecordRaw, RouterOptions } from "vue-router";
+import { useInstaShareContract } from "@/lib/contract-interact/useContract";
+import { accountRepo } from "@/lib/contract-interact/accountRepp";
+import { useWeb3ModalAccount } from "@web3modal/ethers5/vue";
 
 const routes: RouteRecordRaw[] = [
     {
@@ -57,26 +59,46 @@ const options: RouterOptions = {
 };
 
 const router = createRouter(options);
+const { getSigner } = useInstaShareContract();
+const { checkRegistrationStatus } = accountRepo();
+const { isConnected } = useWeb3ModalAccount();
+
+const checkLogin = (): boolean => {
+    try {
+      const status: boolean = isConnected.value ? true : false;
+      return status
+  
+    } catch (error) {
+      console.log('register configration error: ', error)
+    }
+    return false
+  }
+
+const checkRegister = async (): Promise<boolean> => {
+    try {
+        const address = await getSigner().getAddress();
+        const { isRegistered } = await checkRegistrationStatus(address);
+        console.log("has registered: ", isRegistered);
+        return isRegistered;
+    } catch (error) {
+        console.log('register configuration error: ', error);
+    }
+    return false; // Ensure a boolean is always returned
+};
 
 // 添加全局导航守卫
-router.beforeEach((to, from, next) => {
-    // 确保异步组件加载完成
-    if (to.matched.some(record => !record.components)) {
-        // 等待异步组件加载
-        Promise.all(to.matched.map(record => {
-            const Component = record.components?.default;
-            if (Component && typeof Component === 'function') {
-                return Component;
-            }
-            return Promise.resolve();
-        })).then(() => {
-            next();
-        }).catch(error => {
-            console.error('Route error:', error);
-            next(false);
-        });
+router.beforeEach(async (to, from, next) => {
+    const isRegistered: boolean = await checkRegister();
+    const isLogin: boolean = checkLogin();
+
+    if (!isLogin && to.path !== '/register') {
+        next('/register'); // Redirect to register if not logged in
+    }
+    // Check if user is registered before navigating
+    if (!isRegistered && to.path !== '/register') {
+        next('/register'); // Redirect to register if not registered
     } else {
-        next();
+        next(); // Allow navigation
     }
 });
 

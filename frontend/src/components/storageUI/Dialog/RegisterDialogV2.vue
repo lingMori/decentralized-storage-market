@@ -33,38 +33,6 @@
 
           <Card class="border-0 shadow-none">
             <CardContent class="space-y-6">
-              <!-- Rest of the content remains the same -->
-              <!-- Stepper -->
-              <Stepper v-model="currentStep" class="mb-8">
-                <StepperItem :step="1">
-                  <StepperTrigger>
-                    <StepperIndicator>
-                      <Wallet class="h-4 w-4" />
-                    </StepperIndicator>
-                    <StepperTitle>连接钱包</StepperTitle>
-                  </StepperTrigger>
-                  <StepperSeparator />
-                </StepperItem>
-
-                <StepperItem :step="2">
-                  <StepperTrigger>
-                    <StepperIndicator>
-                      <User class="h-4 w-4" />
-                    </StepperIndicator>
-                    <StepperTitle>个人信息</StepperTitle>
-                  </StepperTrigger>
-                  <StepperSeparator />
-                </StepperItem>
-
-                <StepperItem :step="3">
-                  <StepperTrigger>
-                    <StepperIndicator>
-                      <Shield class="h-4 w-4" />
-                    </StepperIndicator>
-                    <StepperTitle>安全验证</StepperTitle>
-                  </StepperTrigger>
-                </StepperItem>
-              </Stepper>
 
               <!-- Step 1: Wallet Connection -->
               <div v-if="currentStep === 1" class="space-y-4">
@@ -74,13 +42,13 @@
                     <Wallet class="mr-2 h-5 w-5" />
                     {{ isLoading ? '连接中...' : '连接 MetaMask' }}
                   </Button>
-                  <Button class="w-full h-12" variant="outline" :disabled="isLoading">
+                  <Button class="w-full h-12" variant="outline" :disabled="isLoading" @click="handleRegister">
                     <Globe class="mr-2 h-5 w-5" />
-                    连接 WalletConnect
+                    注册个人存储账户
                   </Button>
                   <Separator class="my-4" />
                   <div class="grid gap-4">
-                    <Button v-for="platform in socialPlatforms" :key="platform.id" class="w-full h-12" variant="outline"
+                    <Button  v-for="platform in socialPlatforms" :key="platform.id" class="w-full h-12" variant="outline"
                       @click="() => handleSocialLogin(platform.id)">
                       <component :is="platform.icon" class="mr-2 h-5 w-5" />
                       {{ platform.name }}登录
@@ -89,47 +57,11 @@
                 </div>
               </div>
 
-              <!-- Step 2: Personal Information -->
-              <div v-if="currentStep === 2" class="space-y-4">
-                <div class="space-y-2">
-                  <Label>用户名</Label>
-                  <Input type="text" v-model="userDetails.username" placeholder="请输入用户名" />
-                </div>
-                <div class="space-y-2">
-                  <Label>电子邮箱</Label>
-                  <Input type="email" v-model="userDetails.email" placeholder="请输入电子邮箱" />
-                </div>
-              </div>
-
-              <!-- Step 3: Security Verification -->
-              <div v-if="currentStep === 3" class="space-y-4">
-                <Alert>
-                  <Mail class="h-4 w-4" />
-                  <AlertTitle>验证您的邮箱</AlertTitle>
-                  <AlertDescription>
-                    我们已经发送验证码到您的邮箱，请查收并输入验证码。
-                  </AlertDescription>
-                </Alert>
-                <div class="space-y-2">
-                  <Label>验证码</Label>
-                  <Input type="text" v-model="verificationCode" placeholder="请输入6位验证码" maxlength="6" />
-                </div>
-              </div>
-
               <div v-if="registrationError" class="text-red-500 text-sm text-center">
                 {{ registrationError }}
               </div>
 
               <!-- Navigation Buttons -->
-              <div class="flex justify-between">
-                <Button variant="outline" @click="handleBack" :disabled="currentStep === 1 || isLoading">
-                  返回
-                </Button>
-                <Button @click="handleNext" :disabled="isLoading">
-                  {{ currentStep === 3 ? '完成注册' : '下一步' }}
-                  <ChevronRight class="ml-2 h-4 w-4" />
-                </Button>
-              </div>
             </CardContent>
           </Card>
 
@@ -151,42 +83,26 @@
 
 <script setup lang="ts">
 // Script section remains exactly the same
-import { ref, reactive } from 'vue'
+import { ref } from 'vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+
 import { Separator } from '@/components/ui/separator'
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
-import {
-  Stepper,
-  StepperIndicator,
-  StepperItem,
-  StepperSeparator,
-  StepperTitle,
-  StepperTrigger,
-} from '@/components/ui/stepper'
+
 import {
   Wallet,
   Mail,
   Github,
   Globe,
   Laptop,
-  ChevronRight,
-  User,
-  Shield
 } from 'lucide-vue-next'
 import { useWeb3ModalAccount, useWeb3Modal } from '@web3modal/ethers5/vue'
 import { useInstaShareContract } from '@/lib/contract-interact/useContract'
 import { accountRepo } from '@/lib/contract-interact/accountRepp'
-import { useToast } from '@/components/ui/toast'
+import { toast } from 'vue-sonner'
 import router from '@/router'
-
-interface UserDetails {
-  username: string
-  email: string
-  avatar: string | null
-}
+import { AlertCircle } from 'lucide-vue-next'
+import { error } from 'console'
 
 interface SocialPlatform {
   id: string
@@ -198,16 +114,8 @@ interface SocialPlatform {
 const isLoading = ref(false)
 const registrationError = ref<string | null>(null)
 const currentStep = ref(1)
-const verificationCode = ref('')
-
-const userDetails = reactive<UserDetails>({
-  username: '',
-  email: '',
-  avatar: null
-})
 
 // Toast and Web3
-const { toast } = useToast()
 const { isConnected } = useWeb3ModalAccount()
 const { open } = useWeb3Modal()
 const { getSigner } = useInstaShareContract()
@@ -221,19 +129,6 @@ const socialPlatforms: SocialPlatform[] = [
   { id: 'github', name: 'Github', icon: Github }
 ]
 
-const handleNext = async () => {
-  if (currentStep.value < 3) {
-    currentStep.value++
-  } else {
-    await handleRegister()
-  }
-}
-
-const handleBack = () => {
-  if (currentStep.value > 1) {
-    currentStep.value--
-  }
-}
 
 const handleConnectWallet = async () => {
   try {
@@ -248,7 +143,6 @@ const handleConnectWallet = async () => {
       new Promise<void>((resolve) => {
         const timer = setInterval(() => {
           if (isConnected.value) {
-            handleNext()
             clearInterval(timer)
             resolve()
           }
@@ -268,12 +162,18 @@ const handleConnectWallet = async () => {
 }
 
 const handleSocialLogin = (platform: string) => {
-  toast({
-    title: "功能开发中",
-    description: `${platform}登录暂未支持`,
-    variant: "default"
-  })
-  handleNext()
+  toast('该平台功能未启用', {
+      description: `${platform} 登录失败，请尝试其他方式登录`,
+      icon: AlertCircle,
+      style: {
+        background: 'linear-gradient(145deg, #ff416c 0%, #ff4b2b 100%)',
+        color: 'white',
+        borderRadius: '16px',
+        padding: '16px 24px',
+      },
+      duration: 3000,
+      position: 'bottom-center'
+    });
 }
 
 const handleRegister = async () => {
@@ -288,22 +188,18 @@ const handleRegister = async () => {
       throw new Error('无法获取钱包地址')
     }
 
-    // 验证表单
-    if (!userDetails.username || !userDetails.email || !verificationCode.value) {
-      throw new Error('请填写所有必填信息')
-    }
-
     const response = await register()
 
     if (response && response.success) {
       toast({
         title: "注册成功",
-        description: "欢迎加入InstaShare网络！",
+        description: "欢迎加入InstaShare网络!",
         variant: "default"
       })
       router.push('/dashboard/upload')
     } else {
-      throw new Error(response?.error || '注册失败')
+      console.log(response)
+      // throw new Error(response?.error || '注册失败')
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : '未知错误'

@@ -23,12 +23,12 @@
       </div>
     </div>
   </section>
-  <RegisterDialog :is-logged-in="hasLogin" v-on:update:is-logged-in="updateLoginStatus" />
+  <!-- <RegisterDialog :is-logged-in="hasLogin" v-on:update:is-logged-in="updateLoginStatus" /> -->
 </template>
 
 <script setup lang="ts">
 import { computed, inject, onMounted, ref } from 'vue';
-import RegisterDialog from '../Dialog/RegisterDialog.vue';
+// import RegisterDialog from '../Dialog/RegisterDialog.vue';
 
 import useLocalStorage from '@/store/localStorageDB';
 import type { AddResult, KuboRPCClient } from 'kubo-rpc-client';
@@ -78,15 +78,16 @@ onMounted(async () => {
     }
   }
   if (!hasRegisted.value) {
+    
     return; // Exit if not registered
   }
 
   await loadFilesFromGraph();
 })
 
-const updateLoginStatus = (value: boolean) => {
-  hasLogin.value = value;
-};
+// const updateLoginStatus = (value: boolean) => {
+//   hasLogin.value = value;
+// };
 
 const loadFilesFromGraph = async () => {
   localStore.clearCache();
