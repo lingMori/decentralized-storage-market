@@ -1,16 +1,19 @@
-import { BatchSet as BatchSetEvent } from "../generated/PublicShareSimple/PublicShareSimple"
-import { BatchSet } from "../generated/schema"
+import { Bytes, JSONValue, log } from '@graphprotocol/graph-ts'
+import { BatchSet as BatchSetEvent } from '../generated/PublicShareSimple/PublicShareSimple'
+import { KeyValuePair } from '../generated/schema'
 
 export function handleBatchSet(event: BatchSetEvent): void {
-  let entity = new BatchSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity._keys = event.params._keys
-  entity._values = event.params._values
+  const keys = event.params._keys
+  const values = event.params._values
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
+  for (let i = 0; i < keys.length; i++) {
+    const id = keys[i]
+    const keyValuePair = new KeyValuePair(id)
+    
+    keyValuePair.key = keys[i]
+    keyValuePair.value = values[i]
+    keyValuePair.blockTimestamp = event.block.timestamp
 
-  entity.save()
+    keyValuePair.save()
+  }
 }

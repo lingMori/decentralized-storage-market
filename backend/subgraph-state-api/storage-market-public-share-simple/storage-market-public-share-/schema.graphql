@@ -1,8 +1,13 @@
-type BatchSet @entity(immutable: true) {
-  id: Bytes!
-  _keys: [String!]! # string[]
-  _values: [String!]! # string[]
-  blockNumber: BigInt!
+type KeyValuePair @entity {
+  id: ID!
+  key: String!
+  value: String!
   blockTimestamp: BigInt!
-  transactionHash: Bytes!
 }
+
+# type _Schema_ {
+#   """
+#   Placeholder to allow the file to be parsed by graph-cli
+#   """
+#   dummy: String
+# }
