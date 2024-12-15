@@ -1,0 +1,8 @@
+type BatchSet @entity(immutable: true) {
+  id: Bytes!
+  _keys: [String!]! # string[]
+  _values: [String!]! # string[]
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}

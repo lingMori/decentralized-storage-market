@@ -1,0 +1,8 @@
+{
+  "sepolia": {
+    "PublicShareSimple": {
+      "address": "0xC2B5071cBD808a4634232A6981A276947FE76C1f",
+      "startBlock": 7282184
+    }
+  }
+}
