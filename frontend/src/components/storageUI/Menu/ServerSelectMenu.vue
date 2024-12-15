@@ -49,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -118,6 +118,10 @@ const getStatusClass = (status?: ServerStatus) => {
 
 // Define emits
 const emit = defineEmits(['server-selected'])
+
+onMounted(() => {
+  selectedServer.value = servers.value[0]
+})
 </script>
 
 <style scoped lang="scss">
