@@ -48,6 +48,48 @@
                 </DrawerHeader>
 
                 <div class="space-y-4 w-full">
+                  <!-- Stepper Card -->
+                  <Stepper class="flex w-full items-start gap-2" v-model="currentUploadStep">
+                    <StepperItem
+                      v-for="step in uploadSteps"
+                      :key="step.step"
+                      v-slot="{ state }"
+                      class="relative flex w-full flex-col items-center justify-center"
+                      :step="step.step"
+                    >
+                      <StepperSeparator
+                        v-if="step.step !== uploadSteps[uploadSteps.length - 1].step"
+                        class="absolute left-[calc(50%+20px)] right-[calc(-50%+10px)] top-5 block h-0.5 shrink-0 rounded-full bg-muted group-data-[state=completed]:bg-primary"
+                      />
+                      <StepperTrigger as-child>
+                        <Button
+                          :variant="state === 'completed' || state === 'active' ? 'default' : 'outline'"
+                          size="icon"
+                          class="z-10 rounded-full shrink-0"
+                          :class="[state === 'active' && 'ring-2 ring-ring ring-offset-2 ring-offset-background']"
+                        >
+                          <CheckIcon v-if="state === 'completed'" class="size-5" />
+                          <CircleIcon v-if="state === 'active'" />
+                          <DotIcon v-if="state === 'inactive'" />
+                        </Button>
+                      </StepperTrigger>
+                      <div class="mt-5 flex flex-col items-center text-center">
+                        <StepperTitle
+                          :class="[state === 'active' && 'text-primary']"
+                          class="text-sm font-semibold transition lg:text-base"
+                        >
+                          {{ step.title }}
+                        </StepperTitle>
+                        <StepperDescription
+                          :class="[state === 'active' && 'text-primary']"
+                          class="sr-only text-xs text-muted-foreground transition md:not-sr-only lg:text-sm"
+                        >
+                          {{ step.description }}
+                        </StepperDescription>
+                      </div>
+                    </StepperItem>
+                  </Stepper>
+
                   <!-- Overall Progress -->
                   <div class="w-full">
                     <div class="flex mb-2 items-center justify-center">
@@ -138,14 +180,8 @@ import { inject, onMounted, ref, computed } from 'vue'
 import { ethers } from 'ethers'
 import type { KuboRPCClient } from 'kubo-rpc-client';
 import { Upload, CheckCircle, Loader2, X } from 'lucide-vue-next'
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerDescription,
-  DrawerClose
-} from '@/components/ui/drawer'
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerClose } from '@/components/ui/drawer'
+import { Stepper, StepperDescription, StepperItem, StepperSeparator, StepperTitle, StepperTrigger} from '@/components/ui/stepper';
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -171,6 +207,25 @@ const isUploading = ref(false)
 const isUpchaining = ref(false)
 const uploadedFiles = ref<UploadFile[]>([])
 const totalFiles = ref(0)
+const currentUploadStep = ref<number>(1)
+// 定义上传步骤
+const uploadSteps = [
+  {
+    step: 1,
+    title: '选择文件',
+    description: '选择要上传的文件',
+  },
+  {
+    step: 2,
+    title: '上传到 IPFS',
+    description: '将文件上传到分布式存储',
+  },
+  {
+    step: 3,
+    title: '上传到区块链',
+    description: '将文件元数据记录到智能合约',
+  }
+]
 
 // Computed Properties
 const overallProgress = computed(() => {
@@ -250,9 +305,19 @@ const uploadFiles = async (files: FileList) => {
       throw new Error("Ethereum provider is not available");
     }
 
+    // 步骤1: 选择文件
+    currentUploadStep.value = 1
+    if (files.length === 0) {
+      throw new Error("No files selected");
+    }
+
+    // 步骤2：上传到 IPFS
+    currentUploadStep.value = 2
     const fileHashs = await putToIpfs(files)
 
     // upload to chain
+    // 步骤3：上传到区块链
+    currentUploadStep.value = 3
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
     const contract = new ethers.Contract(contractAddress_PublicShareSimple, abi, signer)
@@ -294,6 +359,7 @@ const cancelUpload = () => {
   isUpchaining.value = false
   uploadedFiles.value = []
   totalFiles.value = 0
+  currentUploadStep.value = 0
 }
 
 // Existing methods from original component
