@@ -149,7 +149,11 @@ const uploadFileHandler = async (file: File): Promise<FileItem> => {
   let responseChain;
 
   try {
-    responseIPFS = await ipfsClient.add(file);
+    responseIPFS = await ipfsClient.add(file, {
+      progress: (progress) => {
+        console.log(`Uploading... ${Math.round((progress / file.size) * 100)}%`);
+      }
+    });
     // console.log("草泥马的cid: ", responseIPFS.cid.toString())
   } catch (error) {
     console.log('IPFS upload error:', error);

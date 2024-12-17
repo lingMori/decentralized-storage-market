@@ -1,4 +1,3 @@
-<!-- ServerDropdown.vue -->
 <template>
   <div class="server-dropdown">
     <SwitchServerLoading :show="!hasLoaded" />
@@ -20,18 +19,18 @@
 
         <ScrollArea class="h-[300px]">
           <div class="p-2">
-            <div v-for="server in servers" :key="server.id" class="mb-1">
-              <DropdownMenuItem @click="selectServer(server)">
+            <div v-for="node in availableNodes" :key="node.id" class="mb-1">
+              <DropdownMenuItem @click="selectServer(node)">
                 <div class="flex items-center gap-2 w-full">
-                  <div class="status-dot" :class="getStatusClass(server.status)" />
-                  <ServerIcon class="w-4 h-4" :class="{ 'text-primary': selectedServer?.id === server.id }" />
+                  <div class="status-dot" :class="getStatusClass(node.status)" />
+                  <ServerIcon class="w-4 h-4" :class="{ 'text-primary': selectedServer?.id === node.id }" />
                   <div class="flex flex-col flex-1">
                     <div class="flex items-center justify-between">
-                      <span class="font-medium">{{ server.name }}</span>
+                      <span class="font-medium">{{ node.name }}</span>
                     </div>
-                    <span class="text-xs text-gray-500">{{ server.location }}</span>
+                    <span class="text-xs text-gray-500">{{ node.location }}</span>
                   </div>
-                  <Check v-if="selectedServer?.id === server.id" class="w-4 h-4 ml-2 text-primary" />
+                  <Check v-if="selectedServer?.id === node.id" class="w-4 h-4 ml-2 text-primary" />
                 </div>
               </DropdownMenuItem>
             </div>
@@ -49,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -61,57 +60,35 @@ import {
 import SwitchServerLoading from '../Loading/SwitchServerLoading.vue'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { ServerIcon, ChevronDown, Check, PlusCircle } from 'lucide-vue-next'
+import { useIPFSStore } from '@/store/ipfsServerDB'
 
-type ServerStatus = 'active' | 'warning' | 'offline'
-type ServerType = 'production' | 'staging' | 'development'
+const ipfsStore = useIPFSStore()
 
-interface Server {
-  id: string
-  name: string
-  location: string
-  type: ServerType
-  status: ServerStatus
-}
+// 使用 computed 获取可用节点
+const availableNodes = computed(() => ipfsStore.availableNodes)
 
-// Sample data - replace with your actual server data
-const servers = ref<Server[]>([
-  {
-    id: '1',
-    name: 'Production Server',
-    location: 'US East (N. Virginia)',
-    type: 'production',
-    status: 'active'
-  },
-  {
-    id: '2',
-    name: 'Staging Server',
-    location: 'US West (Oregon)',
-    type: 'staging',
-    status: 'warning'
-  },
-  {
-    id: '3',
-    name: 'Development Server',
-    location: 'Europe (Frankfurt)',
-    type: 'development',
-    status: 'offline'
-  }
-])
+// 获取当前选中的节点
+const selectedServer = computed(() => ipfsStore.getCurrentNode)
 
-const selectedServer = ref<Server | null>(null)
-const hasLoaded = ref<boolean | null>(true)
+const hasLoaded = ref<boolean>(true)
 
-const selectServer = (server: Server) => {
+const selectServer = (node: any) => {
   hasLoaded.value = false
+  
+  // 模拟加载延迟
   setTimeout(() => {
     hasLoaded.value = true
-    selectedServer.value = server
-  }, 1000);
-  emit('server-selected', server)
+    
+    // 使用节点 ID 切换
+    ipfsStore.switchNode(node.id)
+    
+    // 触发事件
+    emit('server-selected', node)
+  }, 1000)
 }
 
 // 获取状态对应的类名
-const getStatusClass = (status?: ServerStatus) => {
+const getStatusClass = (status?: string) => {
   if (!status) return 'status-dot--offline'
   return `status-dot--${status}`
 }
@@ -120,7 +97,10 @@ const getStatusClass = (status?: ServerStatus) => {
 const emit = defineEmits(['server-selected'])
 
 onMounted(() => {
-  selectedServer.value = servers.value[0]
+  // 可以在这里设置默认节点
+  if (!selectedServer.value && availableNodes.value.length > 0) {
+    ipfsStore.switchNode(availableNodes.value[0].id)
+  }
 })
 </script>
 
