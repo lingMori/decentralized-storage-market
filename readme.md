@@ -5,7 +5,7 @@
 InstaShare isn't just a file storage tool—it's the wings for your digital assets in the blockchain era! We're committed to making decentralized storage as easy and intuitive as sending a tweet.
 
 <div align="center">
-  <img src="./public/icons/icon-150x150.png" width="120" alt="InstaShare Logo"/>
+  <img src="frontend/public/icons/icon-150x150.png" width="120" alt="InstaShare Logo"/>
 </div>
 
 ## ✨ Why Choose InstaShare?
