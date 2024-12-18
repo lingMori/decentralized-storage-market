@@ -1,6 +1,7 @@
 import "./assets/index.css"
 import "./assets/base.css"
 import './assets/style.scss'
+import 'vue-files-preview/lib/style.css'
 
 import { createApp } from 'vue'
 import App from './App.vue'
@@ -10,6 +11,7 @@ import piniaModule from "./store"
 // import type { dangoConfig } from "./lib/ipfs-client/dango-ipfs-ts/types/dango.type"
 import { useIPFSStore } from "./store/ipfsServerDB"
 import { IPFSPlugin } from "./lib/ipfs-client/dango-ipfs-ts/plugin/IpfsPlugin"
+import VueFilesPreview from 'vue-files-preview'
 
 // const dangoRPCConfig:dangoConfig = {
 //     protocol: 'http',
@@ -30,7 +32,7 @@ import { IPFSPlugin } from "./lib/ipfs-client/dango-ipfs-ts/plugin/IpfsPlugin"
 const storageApp = createApp(App);
 storageApp.use(routerModule);
 storageApp.use(piniaModule);
-
+storageApp.use(VueFilesPreview)
 
 const ipfsStore = useIPFSStore();
 const initialRPCConfig = ipfsStore.availableNodes[0].rpcConfig;

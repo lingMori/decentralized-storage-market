@@ -25,6 +25,11 @@ const routes: RouteRecordRaw[] = [
                 path: 'public',
                 name: 'Public',
                 component: () => import("@/pages/dashboard/Public.vue")
+            },
+            {
+                path: 'result/:value',
+                name: 'Result',
+                component: () => import("@/pages/dashboard/Result.vue")
             }
         ]
     },

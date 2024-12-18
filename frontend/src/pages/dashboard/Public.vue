@@ -10,8 +10,8 @@
 
         <!-- Search Container -->
         <div class="relative">
-          <input v-model="fileHashToRetrieve" type="text" placeholder="输入文件哈希值检索文件"
-            class="w-full px-6 py-3 border border-gray-300 rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg" />
+          <input v-model="fileHashToRetrieve" type="text" placeholder="输入文件哈希值检索文件" @keyup.enter="retrieveFile"
+            class="w-full text-black px-6 py-3 border border-gray-300 rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg" />
 
           <div class="absolute top-0 right-0 h-full flex items-center pr-4">
             <button @click="retrieveFile" class="icon-color">
@@ -80,7 +80,7 @@
                   <div class="w-full">
                     <div class="flex mb-2 items-center justify-center">
                       <span class="text-sm font-medium icon-color">
-                        总体进度 ({{ overallProgress * totalFiles/100 }}/{{ totalFiles }})
+                        总体进度 ({{ overallProgress * totalFiles / 100 }}/{{ totalFiles }})
                       </span>
                       <span class="text-sm font-medium icon-color">
                         {{ overallProgress }}%
@@ -106,6 +106,7 @@
                             'w-full',
                             'icon-color'
                           ]" /> -->
+                          <!-- 为什么ban了，因为他妈的渲染20000个试试（）） -->
                         </div>
                         <div>
                           <CheckCircle v-if="file.progress === 100" class="h-5 w-5 text-green-500" />
@@ -131,31 +132,6 @@
         </div>
 
         <!-- File Details -->
-        <div v-if="retrievedFile" class="mt-8 p-6 bg-gray-50 rounded-lg shadow-md">
-          <h2 class="text-xl font-semibold mb-4 text-gray-800">文件详情</h2>
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <strong>文件名：</strong>
-              <span>{{ retrievedFile.fileName }}</span>
-            </div>
-            <div>
-              <strong>文件类型：</strong>
-              <span>{{ retrievedFile.fileType }}</span>
-            </div>
-            <div>
-              <strong>文件大小：</strong>
-              <span>{{ formatFileSize(retrievedFile.fileSize) }}</span>
-            </div>
-            <div>
-              <strong>上传时间：</strong>
-              <span>{{ formatDate(retrievedFile.timestamp) }}</span>
-            </div>
-          </div>
-          <div class="mt-4 text-sm text-gray-600">
-            <strong>上传者：</strong>
-            <span>{{ truncateAddress(retrievedFile.uploader) }}</span>
-          </div>
-        </div>
       </div>
     </main>
   </div>
@@ -174,6 +150,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { contractAddress_PublicShareSimple } from '@/configs/CONTRACT_ADDRESS';
 import abi from '/Users/ask/Documents/code/github/storage-market/contract/data-market/abi/PublicShareSimple.json'
 import { toast } from 'vue-sonner';
+import { useRouter } from 'vue-router';
 // Types
 interface UploadFile {
   name: string
@@ -184,7 +161,6 @@ interface UploadFile {
 // Reactive State
 const fileHashToRetrieve = ref('')
 const headerHeight = ref<number>(0)
-const retrievedFile = ref<any>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
 const IpfsClient = inject('dangoRPC') as KuboRPCClient
 
@@ -194,6 +170,7 @@ const isUpchaining = ref(false)
 const uploadedFiles = ref<UploadFile[]>([])
 const totalFiles = ref(0)
 const currentUploadStep = ref<number>(1)
+const router = useRouter()
 // 定义上传步骤
 const uploadSteps = [
   {
@@ -311,11 +288,10 @@ const uploadFiles = async (files: FileList) => {
     const contract = new ethers.Contract(contractAddress_PublicShareSimple, abi, signer)
     // console.log("file uploaded", file); // test file object
     isUpchaining.value = true
+    const fileNames = fileHashs.map((fileHash, index) => (files[index].name))
     const tx = await contract.setBatch(
       fileHashs,
-      fileHashs.map((fileHash, index) => ({
-        fileName: files[index].name
-      }))
+      fileNames
     )
     await tx.wait();
 
@@ -355,20 +331,14 @@ const retrieveFile = async () => {
   if (!fileHashToRetrieve.value) return
 
   try {
-    if (!window.ethereum) {
-      throw new Error("Ethereum provider is not available");
-    }
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const contract = new ethers.Contract('YOUR_CONTRACT_ADDRESS', [
-      "function getFile(string memory _fileHash) public view returns (tuple(address uploader, string fileHash, uint256 timestamp, string fileName, string fileType, uint256 fileSize, bool isActive))"
-    ], provider)
+    const value = fileHashToRetrieve.value
+    // 这里是模拟查询的逻辑，你可以保留现有查询逻辑
 
-    const fileDetails = await contract.getFile(fileHashToRetrieve.value)
-    retrievedFile.value = fileDetails
+    // 跳转到 /result/xxx 页面
+    router.push({ name: 'Result', params: { value: value } })
   } catch (error) {
-    console.error(error)
-    retrievedFile.value = null
-    alert('检索文件详情失败')
+    console.error('Failed to retrieve file:', error)
+    alert('检索文件失败')
   }
 }
 
@@ -378,14 +348,6 @@ const formatFileSize = (bytes: number) => {
   if (bytes === 0) return '0 Byte'
   const i = Math.floor(Math.log(bytes) / Math.log(1024))
   return `${parseFloat((bytes / Math.pow(1024, i)).toFixed(2))} ${sizes[i]}`
-}
-
-const formatDate = (timestamp: number) => {
-  return new Date(timestamp * 1000).toLocaleString()
-}
-
-const truncateAddress = (address: string) => {
-  return `${address.slice(0, 6)}...${address.slice(-4)}`
 }
 
 onMounted(() => {
