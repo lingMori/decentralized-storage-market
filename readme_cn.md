@@ -1,11 +1,23 @@
 # InstaShare 🚀 - 让文件存储如轻点一样简单
-
+[![Development Status](https://img.shields.io/badge/status-active-green.svg)](https://github.com/your-username/instashare)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Web3](https://img.shields.io/badge/Web3-Enabled-blue.svg)]()
 ## 项目愿景
 
 InstaShare 不只是一个文件存储工具，它是您的数字资产在区块链时代自由飞翔的翅膀！我们致力于让去中心化存储变得像发微博一样轻松、直观。
 
 <div align="center">
   <img src="frontend/public/icons/icon-150x150.png" width="120" alt="InstaShare Logo"/>
+</div>
+
+<div align="center" style="display: flex; justify-content: center; gap: 20px; margin: 20px 0; font-size: 20px;">
+    <a href="readme.md">
+        English
+    </a>
+    <a href="readme_cn.md" >
+        中文
+    </a>
 </div>
 
 ## ✨ 为什么选择 InstaShare?

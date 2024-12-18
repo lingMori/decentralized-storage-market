@@ -1,11 +1,23 @@
 # InstaShare 🚀 - File Storage as Simple as a Click
-
+[![Development Status](https://img.shields.io/badge/status-active-green.svg)](https://github.com/your-username/instashare)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Web3](https://img.shields.io/badge/Web3-Enabled-blue.svg)]()
 ## Our Vision
 
 InstaShare isn't just a file storage tool—it's the wings for your digital assets in the blockchain era! We're committed to making decentralized storage as easy and intuitive as sending a tweet.
 
 <div align="center">
   <img src="frontend/public/icons/icon-150x150.png" width="120" alt="InstaShare Logo"/>
+</div>
+
+<div align="center" style="display: flex; justify-content: center; gap: 20px; margin: 20px 0; font-size: 20px;">
+    <a href="readme.md">
+        English
+    </a>
+    <a href="readme_cn.md" >
+        中文
+    </a>
 </div>
 
 ## ✨ Why Choose InstaShare?
