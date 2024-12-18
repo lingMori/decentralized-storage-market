@@ -50,40 +50,26 @@
                 <div class="space-y-4 w-full">
                   <!-- Stepper Card -->
                   <Stepper class="flex w-full items-start gap-2" v-model="currentUploadStep">
-                    <StepperItem
-                      v-for="step in uploadSteps"
-                      :key="step.step"
-                      v-slot="{ state }"
-                      class="relative flex w-full flex-col items-center justify-center"
-                      :step="step.step"
-                    >
-                      <StepperSeparator
-                        v-if="step.step !== uploadSteps[uploadSteps.length - 1].step"
-                        class="absolute left-[calc(50%+20px)] right-[calc(-50%+10px)] top-5 block h-0.5 shrink-0 rounded-full bg-muted group-data-[state=completed]:bg-primary"
-                      />
+                    <StepperItem v-for="step in uploadSteps" :key="step.step" v-slot="{ state }"
+                      class="relative flex w-full flex-col items-center justify-center" :step="step.step">
+                      <StepperSeparator v-if="step.step !== uploadSteps[uploadSteps.length - 1].step"
+                        class="absolute left-[calc(50%+20px)] right-[calc(-50%+10px)] top-5 block h-0.5 shrink-0 rounded-full bg-muted group-data-[state=completed]:bg-primary" />
                       <StepperTrigger as-child>
-                        <Button
-                          :variant="state === 'completed' || state === 'active' ? 'default' : 'outline'"
-                          size="icon"
-                          class="z-10 rounded-full shrink-0"
-                          :class="[state === 'active' && 'ring-2 ring-ring ring-offset-2 ring-offset-background']"
-                        >
+                        <Button :variant="state === 'completed' || state === 'active' ? 'default' : 'outline'"
+                          size="icon" class="z-10 rounded-full shrink-0"
+                          :class="[state === 'active' && 'ring-2 ring-ring ring-offset-2 ring-offset-background']">
                           <CheckIcon v-if="state === 'completed'" class="size-5" />
                           <CircleIcon v-if="state === 'active'" />
                           <DotIcon v-if="state === 'inactive'" />
                         </Button>
                       </StepperTrigger>
                       <div class="mt-5 flex flex-col items-center text-center">
-                        <StepperTitle
-                          :class="[state === 'active' && 'text-primary']"
-                          class="text-sm font-semibold transition lg:text-base"
-                        >
+                        <StepperTitle :class="[state === 'active' && 'text-primary']"
+                          class="text-sm font-semibold transition lg:text-base">
                           {{ step.title }}
                         </StepperTitle>
-                        <StepperDescription
-                          :class="[state === 'active' && 'text-primary']"
-                          class="sr-only text-xs text-muted-foreground transition md:not-sr-only lg:text-sm"
-                        >
+                        <StepperDescription :class="[state === 'active' && 'text-primary']"
+                          class="sr-only text-xs text-muted-foreground transition md:not-sr-only lg:text-sm">
                           {{ step.description }}
                         </StepperDescription>
                       </div>
@@ -94,7 +80,7 @@
                   <div class="w-full">
                     <div class="flex mb-2 items-center justify-center">
                       <span class="text-sm font-medium icon-color">
-                        总体进度 ({{ uploadedFiles.length }}/{{ totalFiles }})
+                        总体进度 ({{ overallProgress * totalFiles/100 }}/{{ totalFiles }})
                       </span>
                       <span class="text-sm font-medium icon-color">
                         {{ overallProgress }}%
@@ -116,10 +102,10 @@
                               {{ file.progress }}%
                             </span>
                           </div>
-                          <Progress :model-value="file.progress" :class="[
+                          <!-- <Progress :model-value="file.progress" :class="[
                             'w-full',
                             'icon-color'
-                          ]" />
+                          ]" /> -->
                         </div>
                         <div>
                           <CheckCircle v-if="file.progress === 100" class="h-5 w-5 text-green-500" />
@@ -181,7 +167,7 @@ import { ethers } from 'ethers'
 import type { KuboRPCClient } from 'kubo-rpc-client';
 import { Upload, CheckCircle, Loader2, X } from 'lucide-vue-next'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerClose } from '@/components/ui/drawer'
-import { Stepper, StepperDescription, StepperItem, StepperSeparator, StepperTitle, StepperTrigger} from '@/components/ui/stepper';
+import { Stepper, StepperDescription, StepperItem, StepperSeparator, StepperTitle, StepperTrigger } from '@/components/ui/stepper';
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -284,8 +270,9 @@ const putToIpfs = async (files: FileList) => {
 
       const response = await IpfsClient.add(file, {
         progress: (progress) => {
-          // Update individual file progress
-          uploadedFiles.value[i].progress = Math.round((progress / file.size) * 100)
+          const progressPercentage = Math.round((progress / file.size) * 100)
+          console.log(`File ${file.name} progress: ${progressPercentage}%`)
+          uploadedFiles.value[i].progress = progressPercentage
         }
       })
       uploadedHashes.push(response.cid.toString())
@@ -314,6 +301,7 @@ const uploadFiles = async (files: FileList) => {
     // 步骤2：上传到 IPFS
     currentUploadStep.value = 2
     const fileHashs = await putToIpfs(files)
+    console.log('ipfs uploaded over !')
 
     // upload to chain
     // 步骤3：上传到区块链
