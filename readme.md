@@ -59,10 +59,10 @@ We've carefully selected our tech stack to deliver the ultimate experience:
 
 ```bash
 # Clone the project
-git clone https://github.com/your-username/instashare.git
+git clone https://github.com/lingMori/decentralized-storage-market.git
 
 # Enter project directory
-cd instashare
+cd decentralized-storage-market
 
 # Install dependencies
 npm install
@@ -71,7 +71,7 @@ npm install
 npm run dev
 ```
 
-🎉 Open `http://localhost:3000` and begin your decentralized storage journey!
+🎉 Open `http://localhost:5173` and begin your decentralized storage journey!
 
 ## 💡 Contribution Guide
 

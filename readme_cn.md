@@ -59,10 +59,10 @@ InstaShare 不只是一个文件存储工具，它是您的数字资产在区块
 
 ```bash
 # 克隆项目
-git clone https://github.com/your-username/instashare.git
+git clone https://github.com/lingMori/decentralized-storage-market.git
 
 # 进入项目目录
-cd instashare
+cd decentralized-storage-market
 
 # 安装依赖
 npm install
@@ -71,7 +71,7 @@ npm install
 npm run dev
 ```
 
-🎉 打开 `http://localhost:3000`，开启你的去中心化存储之旅！
+🎉 打开 `http://localhost:5173`，开启你的去中心化存储之旅！
 
 ## 💡 贡献指南
 
