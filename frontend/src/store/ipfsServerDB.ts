@@ -68,6 +68,27 @@ export const useIPFSStore = defineStore('ipfs', {
         }))
       }
     },
+
+    async fetchAvaliableNodes(url: string) {
+      try {
+        const response = await fetch(url)
+        if (!response.ok){
+          throw new Error(`Http error! status: ${response.status}`)
+        }
+
+        const nodes = await response.json() as IPFSNode[]
+        this.availableNodes = nodes
+
+        // If current node is not in the new list, reset it
+        if (this.currentNode && !nodes.find(node => node.id === this.currentNode?.id)) {
+          this.currentNode = null
+        }
+
+        return nodes
+      }catch(error) {
+        throw new Error (`Filed to fetch nodes: ${error} !`)
+      }
+    },
     
     // 获取当前节点状态
     getCurrentNodeStatus() {
