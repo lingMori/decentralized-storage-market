@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: storm_thunder_postgres_server
+    ports:
+      - 5432:5432
+    volumes:
+      - /Volumes/T7\ Shield/docker/postgres/container
+    environment:
+      POSTGRES_USER: 'root'
+      POSTGRES_PASSWORD: 'xxxxxx'
