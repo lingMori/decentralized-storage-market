@@ -1,25 +1,26 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/utils/Pausable.sol";
-
-contract InstaShare is Ownable, ReentrancyGuard, Pausable {
-    constructor(address initialOwner) Ownable(initialOwner) {}
+contract InstaShare {
+    address private _owner;
+    bool private _paused;
+    
+    constructor() {
+        _owner = msg.sender;
+    }
 
     struct FileInfo {
         string cid;
         uint256 size;
         uint256 timestamp;
         string fileType;
+        string storageSource;
         bool isActive;
         bool exists;
     }
 
     struct InstanceOwner {
         address ownerAddress;
-        address storageSource;
         uint256 freeLoad;
         uint256 maxLoad;
         bool isLocked;
@@ -32,9 +33,9 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
     mapping(address => InstanceOwner) public instanceOwners;
     
     // Events
-    event InstanceOwnerRegistered(address ownerAddress, address storageSource, uint256 freeLoad, bool isLocked);
+    event InstanceOwnerRegistered(address ownerAddress, uint256 freeLoad, bool isLocked);
     event FreeLoadUpdated(address ownerAddress, uint256 freeLoad);
-    event FileUploaded(address owner, string cid, uint256 size, string fileType, string fileName);
+    event FileUploaded(address owner, string cid, uint256 size, string fileType, string storageSource, string fileName);
     event FileStatusUpdated(address owner, string cid, bool isActive);
     event FileRemoved(address owner, string cid);
     event InstanceLockStatusUpdated(address owner, bool isLocked);
@@ -44,7 +45,6 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
     // Errors
     error AlreadyRegistered();
     error NotRegistered();
-    error NotStorageSourcer();
     error InstanceLocked();
     error InsufficientFreeLoad();
     error FileNotFound();
@@ -52,18 +52,45 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
     error InvalidCID();
     error FileAlreadyExists();
     error LoadExceedsMaximum();
+    error NotOwner();
+    error ReentrantCall();
+    error Paused();
+    error NotPaused();
 
     // Modifiers
-    modifier onlyRegistered() {
-        if (instanceOwners[msg.sender].ownerAddress != msg.sender) {
-            revert NotRegistered();
+    modifier onlyOwner() {
+        if (msg.sender != _owner) {
+            revert NotOwner();
         }
         _;
     }
 
-    modifier  onlyStorageSourcer() {
-        if (instanceOwners[msg.sender].storageSource != msg.sender) {
-            revert NotStorageSourcer();
+    modifier nonReentrant() {
+        if (_locked) {
+            revert ReentrantCall();
+        }
+        _locked = true;
+        _;
+        _locked = false;
+    }
+
+    modifier whenNotPaused() {
+        if (_paused) {
+            revert Paused();
+        }
+        _;
+    }
+
+    modifier whenPaused() {
+        if (!_paused) {
+            revert NotPaused();
+        }
+        _;
+    }
+
+    modifier onlyRegistered() {
+        if (instanceOwners[msg.sender].ownerAddress != msg.sender) {
+            revert NotRegistered();
         }
         _;
     }
@@ -75,6 +102,9 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
         _;
     }
 
+    // Reentrancy guard
+    bool private _locked;
+
     function registerInstanceOwner() public whenNotPaused {
         if (instanceOwners[msg.sender].ownerAddress == msg.sender) {
             revert AlreadyRegistered();
@@ -82,19 +112,19 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
 
         InstanceOwner storage newOwner = instanceOwners[msg.sender];
         newOwner.ownerAddress = msg.sender;
-        newOwner.storageSource = msg.sender;
         newOwner.freeLoad = 128 * 1024 * 1024; // 128MB in bytes
         newOwner.maxLoad = 128 * 1024 * 1024; // 128MB in bytes
         newOwner.isLocked = false;
         newOwner.totalFiles = 0;
 
-        emit InstanceOwnerRegistered(msg.sender, newOwner.storageSource, newOwner.freeLoad, newOwner.isLocked);
+        emit InstanceOwnerRegistered(msg.sender, newOwner.freeLoad, newOwner.isLocked);
     }
 
     function uploadFile(
         string calldata cid,
         uint256 fileSize,
         string calldata fileType,
+        string calldata storageSource,
         string calldata fileName
     ) public whenNotPaused onlyRegistered notLocked nonReentrant {
         if (fileSize == 0 || fileSize > 100 * 1024 * 1024) {
@@ -117,6 +147,7 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
             size: fileSize,
             timestamp: block.timestamp,
             fileType: fileType,
+            storageSource: storageSource,
             isActive: true,
             exists: true
         });
@@ -127,7 +158,7 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
         owner.totalFiles++;
         owner.freeLoad -= fileSize;
 
-        emit FileUploaded(msg.sender, cid, fileSize, fileType, fileName);
+        emit FileUploaded(msg.sender, cid, fileSize, fileType, storageSource, fileName);
         emit FreeLoadUpdated(msg.sender, owner.freeLoad);
     }
 
@@ -135,6 +166,7 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
         string[] calldata cids,
         uint256[] calldata fileSizes,
         string[] calldata fileTypes,
+        string[] calldata storageSources,
         string[] calldata fileNames
     ) public whenNotPaused onlyRegistered notLocked nonReentrant {
         uint256 totalFiles = cids.length;
@@ -142,6 +174,7 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
         if (
             totalFiles != fileSizes.length ||
             totalFiles != fileTypes.length ||
+            totalFiles != storageSources.length ||
             totalFiles != fileNames.length
         ) {
             revert("Input array lengths must match");
@@ -153,6 +186,7 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
             string memory cid = cids[i];
             uint256 fileSize = fileSizes[i];
             string memory fileType = fileTypes[i];
+            string memory storageSource = storageSources[i];
             string memory fileName = fileNames[i];
 
             if (fileSize == 0 || fileSize > 100 * 1024 * 1024) {
@@ -173,6 +207,7 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
                 size: fileSize,
                 timestamp: block.timestamp,
                 fileType: fileType,
+                storageSource: storageSource,
                 isActive: true,
                 exists: true
             });
@@ -183,7 +218,7 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
             owner.totalFiles++;
             owner.freeLoad -= fileSize;
 
-            emit FileUploaded(msg.sender, cid, fileSize, fileType, fileName);
+            emit FileUploaded(msg.sender, cid, fileSize, fileType, storageSource, fileName);
         }
 
         emit FreeLoadUpdated(msg.sender, owner.freeLoad);
@@ -197,10 +232,8 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
             revert FileNotFound();
         }
 
-        // 返还存储空间
         owner.freeLoad += file.size;
         
-        // 从fileList数组中移除
         uint256 fileIndex = owner.fileIndexes[cid];
         uint256 lastIndex = owner.fileList.length - 1;
         
@@ -211,10 +244,8 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
         }
         owner.fileList.pop();
         
-        // 清除索引映射
         delete owner.fileIndexes[cid];
         
-        // 标记文件为不存在，而不是完全删除
         file.exists = false;
         file.isActive = false;
         
@@ -235,10 +266,8 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
                 revert FileNotFound();
             }
 
-            // 返还存储空间
             owner.freeLoad += file.size;
             
-            // 从fileList数组中移除
             uint256 fileIndex = owner.fileIndexes[cid];
             uint256 lastIndex = owner.fileList.length - 1;
 
@@ -249,10 +278,8 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
             }
             owner.fileList.pop();
             
-            // 清除索引映射
             delete owner.fileIndexes[cid];
             
-            // 标记文件为不存在，而不是完全删除
             file.exists = false;
             file.isActive = false;
 
@@ -273,7 +300,6 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
         emit FileStatusUpdated(msg.sender, cid, isActive);
     }
 
-    // New functions for load management and querying
     function increaseFreeLoad(uint256 additionalLoad) public onlyRegistered {
         InstanceOwner storage owner = instanceOwners[msg.sender];
         if (owner.freeLoad + additionalLoad > owner.maxLoad) {
@@ -284,7 +310,6 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
         emit LoadIncreased(msg.sender, additionalLoad);
     }
 
-    // Admin functions
     function updateMaxLoad(uint256 newMaxLoad, address ownerAddress) public onlyOwner {
         if (instanceOwners[ownerAddress].ownerAddress != ownerAddress) {
             revert NotRegistered();
@@ -306,7 +331,6 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
         emit InstanceLockStatusUpdated(ownerAddress, locked);
     }
 
-    // Batch admin operations
     function batchUpdateMaxLoads(
         address[] calldata owners, 
         uint256[] calldata newMaxLoads
@@ -329,7 +353,6 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
         }
     }
 
-    // Metadata and stats functions
     function getFileInfo(address owner, string calldata cid) public view returns (FileInfo memory) {
         FileInfo storage file = instanceOwners[owner].files[cid];
         if (!file.exists) {
@@ -341,14 +364,15 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
     function getFileMetadata(address owner, string calldata cid) public view returns (
         uint256 size, 
         uint256 timestamp, 
-        string memory fileType, 
+        string memory fileType,
+        string memory storageSource,
         bool isActive
     ) {
         FileInfo storage file = instanceOwners[owner].files[cid];
         if (!file.exists) {
             revert FileNotFound();
         }
-        return (file.size, file.timestamp, file.fileType, file.isActive);
+        return (file.size, file.timestamp, file.fileType, file.storageSource, file.isActive);
     }
 
     function getFileList(address owner) public view returns (string[] memory) {
@@ -370,12 +394,11 @@ contract InstaShare is Ownable, ReentrancyGuard, Pausable {
         );
     }
 
-    // Emergency functions
-    function pause() public onlyOwner {
-        _pause();
+    function pause() public onlyOwner whenNotPaused {
+        _paused = true;
     }
 
-    function unpause() public onlyOwner {
-        _unpause();
+    function unpause() public onlyOwner whenPaused {
+        _paused = false;
     }
 }

@@ -93,18 +93,19 @@ const checkRegister = async (): Promise<boolean> => {
 
 // 添加全局导航守卫
 router.beforeEach(async (to, from, next) => {
-    const isRegistered: boolean = await checkRegister();
-    const isLogin: boolean = checkLogin();
+    // const isRegistered: boolean = await checkRegister();
+    // const isLogin: boolean = checkLogin();
 
-    if (!isLogin && to.path !== '/register') {
-        next('/register'); // Redirect to register if not logged in
-    }
-    // Check if user is registered before navigating
-    if (!isRegistered && to.path !== '/register') {
-        next('/register'); // Redirect to register if not registered
-    } else {
-        next(); // Allow navigation
-    }
+    // if (!isLogin && to.path !== '/register') {
+    //     next('/register'); // Redirect to register if not logged in
+    // }
+    // // Check if user is registered before navigating
+    // if (!isRegistered && to.path !== '/register') {
+    //     next('/register'); // Redirect to register if not registered
+    // } else {
+    //     next(); // Allow navigation
+    // }
+    next()
 });
 
 export default router;

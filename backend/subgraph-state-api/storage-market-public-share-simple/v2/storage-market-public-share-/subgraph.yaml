@@ -1,0 +1,26 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: PublicShareSimple
+    network: buaanet
+    source:
+      address: "0x536D5Aa122ffe4f67dADac324C14F3E12C25b0eD"
+      abi: PublicShareSimple
+      startBlock: 1
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - KeyValuePair
+      abis:
+        - name: PublicShareSimple
+          file: ./abis/PublicShareSimple.json
+      eventHandlers:
+        - event: BatchSet(string[],string[])
+          handler: handleBatchSet
+      file: ./src/public-share-simple.ts

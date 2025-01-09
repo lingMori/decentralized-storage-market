@@ -1,0 +1,13 @@
+type KeyValuePair @entity {
+  id: ID!
+  key: String!
+  value: String!
+  blockTimestamp: BigInt!
+}
+
+# type _Schema_ {
+#   """
+#   Placeholder to allow the file to be parsed by graph-cli
+#   """
+#   dummy: String
+# }

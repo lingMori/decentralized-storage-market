@@ -1,0 +1,8 @@
+{
+  "sepolia": {
+    "InstaShare": {
+      "address": "0x2D8593d5f03fb0Ce88A464c7c3cc97e10AF04aBE",
+      "startBlock": 1
+    }
+  }
+}

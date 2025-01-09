@@ -1,0 +1,47 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: InstaShare
+    network: sepolia
+    source:
+      address: "0x2D8593d5f03fb0Ce88A464c7c3cc97e10AF04aBE"
+      abi: InstaShare
+      startBlock: 1
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - FileRemoved
+        - FileStatusUpdated
+        - FileUploaded
+        - FreeLoadUpdated
+        - InstanceLockStatusUpdated
+        - InstanceOwnerRegistered
+        - LoadIncreased
+        - MaxLoadUpdated
+      abis:
+        - name: InstaShare
+          file: ./abis/InstaShare.json
+      eventHandlers:
+        - event: FileRemoved(address,string)
+          handler: handleFileRemoved
+        - event: FileStatusUpdated(address,string,bool)
+          handler: handleFileStatusUpdated
+        - event: FileUploaded(address,string,uint256,string,string,string)
+          handler: handleFileUploaded
+        - event: FreeLoadUpdated(address,uint256)
+          handler: handleFreeLoadUpdated
+        - event: InstanceLockStatusUpdated(address,bool)
+          handler: handleInstanceLockStatusUpdated
+        - event: InstanceOwnerRegistered(address,uint256,bool)
+          handler: handleInstanceOwnerRegistered
+        - event: LoadIncreased(address,uint256)
+          handler: handleLoadIncreased
+        - event: MaxLoadUpdated(uint256,address)
+          handler: handleMaxLoadUpdated
+      file: ./src/insta-share.ts

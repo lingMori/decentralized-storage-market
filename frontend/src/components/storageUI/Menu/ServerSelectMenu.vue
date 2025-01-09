@@ -38,12 +38,18 @@
         </ScrollArea>
 
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem @click="openOrderDialog">
           <PlusCircle class="w-4 h-4 mr-2" />
           Add New Server
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+    
+    <DataOrderDialog 
+      :is-open="isOrderDialogOpen"
+      @update:is-open="updateDialogStatus"
+      @order-completed="handleOrderCompleted"
+    />
   </div>
 </template>
 
@@ -58,11 +64,26 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import SwitchServerLoading from '../Loading/SwitchServerLoading.vue'
+import DataOrderDialog from '../Dialog/DataOrderDialog.vue'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { ServerIcon, ChevronDown, Check, PlusCircle } from 'lucide-vue-next'
 import { useIPFSStore } from '@/store/ipfsServerDB'
+import { useToast } from '@/components/ui/toast'
+
+// 类型定义
+interface ServerNode {
+  id: string
+  name: string
+  location: string
+  status?: string
+}
 
 const ipfsStore = useIPFSStore()
+const { toast } = useToast()
+
+// 状态管理
+const hasLoaded = ref<boolean>(true)
+const isOrderDialogOpen = ref<boolean>(false)
 
 // 使用 computed 获取可用节点
 const availableNodes = computed(() => ipfsStore.availableNodes)
@@ -70,9 +91,8 @@ const availableNodes = computed(() => ipfsStore.availableNodes)
 // 获取当前选中的节点
 const selectedServer = computed(() => ipfsStore.getCurrentNode)
 
-const hasLoaded = ref<boolean>(true)
-
-const selectServer = (node: any) => {
+// 处理节点选择
+const selectServer = (node: ServerNode) => {
   hasLoaded.value = false
   
   // 模拟加载延迟
@@ -93,8 +113,40 @@ const getStatusClass = (status?: string) => {
   return `status-dot--${status}`
 }
 
+// 打开订单对话框
+const openOrderDialog = () => {
+  isOrderDialogOpen.value = true
+}
+
+// 更新对话框状态
+const updateDialogStatus = (value: boolean) => {
+  isOrderDialogOpen.value = value
+}
+
+// 处理订单完成
+const handleOrderCompleted = async () => {
+  try {
+    // 刷新节点列表
+    await ipfsStore.fetchAvaliableNodes("aaa")
+    
+    toast({
+      title: "服务器添加成功",
+      description: "新的存储服务器已添加到您的账户",
+      variant: "default"
+    })
+  } catch (err) {
+    toast({
+      title: "刷新失败",
+      description: err instanceof Error ? err.message : "更新节点列表失败",
+      variant: "destructive"
+    })
+  }
+}
+
 // Define emits
-const emit = defineEmits(['server-selected'])
+const emit = defineEmits<{
+  'server-selected': [node: ServerNode]
+}>()
 
 onMounted(() => {
   // 可以在这里设置默认节点

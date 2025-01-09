@@ -16,6 +16,7 @@ export const useIPFSStore = defineStore('ipfs', {
   state: () => ({
     currentNode: null as IPFSNode | null,
     availableNodes: [
+      // nodes config
       {
         id: '1',
         name: '节点1',

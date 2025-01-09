@@ -29,6 +29,7 @@ declare module 'vue' {
     ChartTooltip: typeof import('./src/components/ui/chart/ChartTooltip.vue')['default']
     Checkbox: typeof import('./src/components/ui/checkbox/Checkbox.vue')['default']
     DashboardHeader: typeof import('./src/components/storageUI/Header/DashboardHeader.vue')['default']
+    DataOrderDialog: typeof import('./src/components/storageUI/Dialog/DataOrderDialog.vue')['default']
     Dialog: typeof import('./src/components/ui/dialog/Dialog.vue')['default']
     DialogClose: typeof import('./src/components/ui/dialog/DialogClose.vue')['default']
     DialogContent: typeof import('./src/components/ui/dialog/DialogContent.vue')['default']

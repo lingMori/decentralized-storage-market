@@ -1,0 +1,77 @@
+type FileRemoved @entity(immutable: true) {
+  id: Bytes!
+  owner: Bytes! # address
+  cid: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type FileStatusUpdated @entity(immutable: true) {
+  id: Bytes!
+  owner: Bytes! # address
+  cid: String! # string
+  isActive: Boolean! # bool
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type FileUploaded @entity(immutable: true) {
+  id: Bytes!
+  owner: Bytes! # address
+  cid: String! # string
+  size: BigInt! # uint256
+  fileType: String! # string
+  storageSource: String! # string
+  fileName: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type FreeLoadUpdated @entity(immutable: true) {
+  id: Bytes!
+  ownerAddress: Bytes! # address
+  freeLoad: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type InstanceLockStatusUpdated @entity(immutable: true) {
+  id: Bytes!
+  owner: Bytes! # address
+  isLocked: Boolean! # bool
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type InstanceOwnerRegistered @entity(immutable: true) {
+  id: Bytes!
+  ownerAddress: Bytes! # address
+  freeLoad: BigInt! # uint256
+  isLocked: Boolean! # bool
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type LoadIncreased @entity(immutable: true) {
+  id: Bytes!
+  owner: Bytes! # address
+  additionalLoad: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MaxLoadUpdated @entity(immutable: true) {
+  id: Bytes!
+  newMaxLoad: BigInt! # uint256
+  ownerAddress: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
