@@ -1,9 +1,11 @@
 import type { BigNumber } from "ethers";
 import { useInstaShareContract } from "./useContract";
+import { useIPFSStore } from "@/store/ipfsServerDB";
 
 interface FileRepoResponse {
   success: boolean;
   error?: string;
+  sourceID?: string;
 }
 
 export interface FileObject {
@@ -19,14 +21,16 @@ export const fileRepo = (): {
 } => {
 
   const { getContract } = useInstaShareContract();
+  const ipfsStore = useIPFSStore();
 
   const uploadFile = async (file: FileObject):Promise<FileRepoResponse> => {
     try {
       const contract = getContract();
+      const serverID = ipfsStore.getCurrentNode?.id
       // console.log("file uploaded", file); // test file object
-      const tx = await contract.uploadFile(file.cid, file.fileSize, file.fileType, file.fileName); // 确保等待交易完成
+      const tx = await contract.uploadFile(file.cid, file.fileSize, file.fileType, serverID ?? '', file.fileName); // 确保等待交易完成
       await tx.wait();
-      return { success: true } as FileRepoResponse;
+      return { success: true, sourceID:serverID } as FileRepoResponse;
     } catch (error: any) {
       // console.log(error);
       if (error.data.code === 4001) { // 直接检查 error.code

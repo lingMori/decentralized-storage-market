@@ -24,6 +24,7 @@ export enum FileStatus {
     size: bigint;                  // 文件大小
     fileType: string;              // 文件类型
     fileName: string;              // 文件名
+    storageSource: string;         // 存储源
     isActive: boolean;             // 是否激活
     createdAt: bigint;             // 创建时间
     lastUpdated: bigint;           // 最后更新时间

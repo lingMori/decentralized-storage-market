@@ -1,77 +1,72 @@
-type FileRemoved @entity(immutable: true) {
-  id: Bytes!
-  owner: Bytes! # address
-  cid: String! # string
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+# 定义用户实体
+type User @entity {
+  id: ID!                     # address
+  totalFiles: BigInt!         # 文件总数
+  freeLoad: BigInt!          # 可用空间
+  isLocked: Boolean!         # 是否被锁定
+  files: [File!]! @derivedFrom(field: "owner")  # 用户拥有的文件
+  createdAt: BigInt!         # 注册时间
+  maxLoad: BigInt!           # 最大空间
+  lastUpdated: BigInt!       # 最后更新时间
 }
 
-type FileStatusUpdated @entity(immutable: true) {
-  id: Bytes!
-  owner: Bytes! # address
-  cid: String! # string
-  isActive: Boolean! # bool
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+# 定义文件实体
+type File @entity {
+  id: ID!                    # unique id (owner address + cid)
+  cid: String!              # IPFS CID
+  owner: User!              # 文件所有者
+  size: BigInt!             # 文件大小
+  fileType: String!         # 文件类型
+  fileName: String!         # 文件名
+  storageSource: String!    # 文件存储源
+  isActive: Boolean!        # 是否激活
+  createdAt: BigInt!        # 创建时间
+  lastUpdated: BigInt!      # 最后更新时间
+  status: FileStatus!       # 文件状态
 }
 
-type FileUploaded @entity(immutable: true) {
-  id: Bytes!
-  owner: Bytes! # address
-  cid: String! # string
-  size: BigInt! # uint256
-  fileType: String! # string
-  storageSource: String! # string
-  fileName: String! # string
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+# 定义文件状态枚举
+enum FileStatus {
+  ACTIVE
+  INACTIVE
+  REMOVED
 }
 
-type FreeLoadUpdated @entity(immutable: true) {
-  id: Bytes!
-  ownerAddress: Bytes! # address
-  freeLoad: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+# 定义系统配置实体
+type SystemConfig @entity {
+  id: ID!                    # 唯一标识符 (通常为 "1")
+  owner: String!            # 合约所有者地址
+  paused: Boolean!          # 系统是否暂停
+  lastUpdated: BigInt!      # 最后更新时间
 }
 
-type InstanceLockStatusUpdated @entity(immutable: true) {
-  id: Bytes!
-  owner: Bytes! # address
-  isLocked: Boolean! # bool
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+# 定义文件操作历史记录
+type FileHistory @entity {
+  id: ID!                    # 唯一标识符 (transaction hash + log index)
+  file: File!               # 关联的文件
+  action: String!           # 操作类型 (UPLOAD/REMOVE/UPDATE)
+  actor: String!            # 执行操作的地址
+  timestamp: BigInt!        # 操作时间
+  transactionHash: String!  # 交易哈希
 }
 
-type InstanceOwnerRegistered @entity(immutable: true) {
-  id: Bytes!
-  ownerAddress: Bytes! # address
-  freeLoad: BigInt! # uint256
-  isLocked: Boolean! # bool
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+# 定义用户操作历史记录
+type UserHistory @entity {
+  id: ID!                    # 唯一标识符 (transaction hash + log index)
+  user: User!               # 关联的用户
+  action: String!           # 操作类型 (REGISTER/UPDATE/LOCK)
+  oldValue: String          # 旧值
+  newValue: String          # 新值
+  timestamp: BigInt!        # 操作时间
+  transactionHash: String!  # 交易哈希
 }
 
-type LoadIncreased @entity(immutable: true) {
-  id: Bytes!
-  owner: Bytes! # address
-  additionalLoad: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type MaxLoadUpdated @entity(immutable: true) {
-  id: Bytes!
-  newMaxLoad: BigInt! # uint256
-  ownerAddress: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+# 定义系统统计信息
+type Statistics @entity {
+  id: ID!                    # 唯一标识符 (通常为 "1")
+  totalUsers: BigInt!       # 总用户数
+  totalFiles: BigInt!       # 总文件数
+  totalStorage: BigInt!     # 总存储使用量
+  activeFiles: BigInt!      # 活跃文件数
+  lastUpdated: BigInt!      # 最后更新时间
 }

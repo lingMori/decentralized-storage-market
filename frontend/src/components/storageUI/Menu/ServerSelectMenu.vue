@@ -49,6 +49,7 @@
       :is-open="isOrderDialogOpen"
       @update:is-open="updateDialogStatus"
       @order-completed="handleOrderCompleted"
+      
     />
   </div>
 </template>

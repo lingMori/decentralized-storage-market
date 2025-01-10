@@ -223,6 +223,7 @@ const uploadFileHandler = async (file: File): Promise<FileItem> => {
     cid: responseIPFS.cid.toString(),
     status: 'active',
     lastModified: file.lastModified.toString(),
+    storageSource: responseChain.sourceID,
     size: file.size.toString(),
     type: file.type
   } as FileItem;

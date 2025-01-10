@@ -1,81 +1,239 @@
 <template>
-  <Dialog :open="isOpen" @update:open="val => updateDialogStatus(val)">
-    <DialogContent v-on:interact-outside="(e: Event) => { e.preventDefault(); }">
-      <Card class="w-full border-0 shadow-none">
+  <Dialog :open="isOpen" @update:open="val => updateDialogStatus(val)" class="max-h-[90vh] overflow-y-auto w-[1200px]">
+    <DialogContent v-on:interact-outside="(e: Event) => { e.preventDefault(); }" class="max-h-[90vh] overflow-y-auto max-w-fit">
+      <Card class="border-0 shadow-none w-[1000px]">
         <CardHeader>
-          <CardTitle class="text-2xl font-bold text-center">存储资源市场</CardTitle>
-          <CardDescription class="text-center">
-            选择并购买您需要的存储空间
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <!-- 存储资源列表 -->
-          <div class="grid gap-4">
-            <Card v-for="provider in providers" 
-                  :key="provider.sellID" 
-                  class="w-full hover:bg-accent transition-colors cursor-pointer"
-                  @click="openPurchaseDialog(provider)">
-              <CardContent class="p-4">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2">
-                    <ServerIcon class="h-5 w-5 text-muted-foreground" />
-                    <div>
-                      <div class="font-medium">存储提供商 #{{ provider.sellID }}</div>
-                      <div class="text-sm text-muted-foreground truncate">{{ provider.providerAddress }}</div>
-                    </div>
-                  </div>
-                  <div class="text-right">
-                    <div class="font-medium">{{ provider.availableSpace }} MB</div>
-                    <div class="text-sm text-muted-foreground">
-                      {{ formatEther(provider.pricePerMBPerMonth) }} ETH/MB
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          <div class="flex items-center justify-between">
+            <div>
+              <CardTitle class="text-3xl font-bold">存储资源市场</CardTitle>
+              <CardDescription class="text-lg mt-2">
+                选择并购买您需要的存储空间
+              </CardDescription>
+            </div>
+            <div class="flex items-center gap-4">
+              <Button variant="outline" @click="refreshData" :disabled="isLoading">
+                <RefreshCcwIcon class="w-4 h-4 mr-2" />
+                刷新
+              </Button>
+              <Select v-model="sortBy">
+                <SelectTrigger class="w-40">
+                  <SelectValue placeholder="排序方式" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="price-asc">价格从低到高</SelectItem>
+                  <SelectItem value="price-desc">价格从高到低</SelectItem>
+                  <SelectItem value="space-asc">空间从小到大</SelectItem>
+                  <SelectItem value="space-desc">空间从大到小</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+        </CardHeader>
+
+        <CardContent>
+          <Tabs defaultValue="grid" class="w-full">
+            <TabsList class="mb-4">
+              <TabsTrigger value="grid">
+                <LayoutGridIcon class="w-4 h-4 mr-2" />
+                网格视图
+              </TabsTrigger>
+              <TabsTrigger value="list">
+                <ListIcon class="w-4 h-4 mr-2" />
+                列表视图
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="grid">
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <Card v-for="provider in sortedProviders" 
+                      :key="provider.sellID" 
+                      class="hover:bg-accent/5 transition-colors cursor-pointer"
+                      @click="openPurchaseDialog(provider)">
+                  <CardContent class="p-6">
+                    <div class="space-y-4">
+                      <div class="flex items-center justify-between">
+                        <Badge variant="outline">节点 #{{ provider.sellID }}</Badge>
+                        <Badge :variant="getReputationVariant(provider.reputation)">
+                          {{ getReputationLabel(provider.reputation) }}
+                        </Badge>
+                      </div>
+                      
+                      <div class="space-y-2">
+                        <div class="flex items-center gap-2">
+                          <ServerIcon class="h-5 w-5 text-muted-foreground" />
+                          <div class="font-medium truncate">{{ provider.providerAddress }}</div>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                          <HardDriveIcon class="h-5 w-5 text-muted-foreground" />
+                          <div class="font-medium">{{ provider.availableSpace }} MB 可用空间</div>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                          <CoinsIcon class="h-5 w-5 text-muted-foreground" />
+                          <div class="font-medium">{{ formatEther(provider.stakedETH) }} ETH 质押</div>
+                        </div>
+                      </div>
+
+                      <Separator />
+
+                      <div class="flex items-center justify-between">
+                        <div class="text-sm text-muted-foreground">每月价格</div>
+                        <div class="text-lg font-bold">
+                          {{ formatEther(provider.pricePerMBPerMonth) }} ETH/MB
+                        </div>
+                      </div>
+
+                      <div class="flex items-center gap-2">
+                        <Progress :value="provider.uptime" class="flex-1" />
+                        <span class="text-sm text-muted-foreground">
+                          在线率 {{ provider.uptime }}%
+                        </span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="list">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>节点ID</TableHead>
+                    <TableHead>提供商地址</TableHead>
+                    <TableHead>可用空间</TableHead>
+                    <TableHead>每月价格</TableHead>
+                    <TableHead>质押金额</TableHead>
+                    <TableHead>在线率</TableHead>
+                    <TableHead>信誉等级</TableHead>
+                    <TableHead></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow v-for="provider in sortedProviders" :key="provider.sellID">
+                    <TableCell>{{ provider.sellID }}</TableCell>
+                    <TableCell class="font-mono">{{ provider.providerAddress }}</TableCell>
+                    <TableCell>{{ provider.availableSpace }} MB</TableCell>
+                    <TableCell>{{ formatEther(provider.pricePerMBPerMonth) }} ETH/MB</TableCell>
+                    <TableCell>{{ formatEther(provider.stakedETH) }} ETH</TableCell>
+                    <TableCell>{{ provider.uptime }}%</TableCell>
+                    <TableCell>
+                      <Badge :variant="getReputationVariant(provider.reputation)">
+                        {{ getReputationLabel(provider.reputation) }}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Button variant="outline" size="sm" @click="openPurchaseDialog(provider)">
+                        购买
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </DialogContent>
   </Dialog>
 
   <!-- 购买确认对话框 -->
-  <Dialog :open="isPurchaseDialogOpen" @update:open="val => updatePurchaseDialogStatus(val)">
+  <Dialog :open="isPurchaseDialogOpen" @update:open="val => updatePurchaseDialogStatus(val)" class="w-[800px]">
     <DialogContent v-if="selectedProvider">
       <Card class="w-full border-0 shadow-none">
         <CardHeader>
-          <CardTitle class="text-xl font-bold">确认购买</CardTitle>
+          <CardTitle class="text-2xl font-bold">购买存储空间</CardTitle>
           <CardDescription>
-            请确认以下存储空间购买信息
+            请填写购买信息并确认
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div class="space-y-4">
-            <div class="grid gap-4">
+          <div class="space-y-6">
+            <div class="grid gap-4 p-4 bg-accent/5 rounded-lg">
               <div class="space-y-2">
                 <h4 class="font-medium">提供商信息</h4>
-                <div class="text-sm text-muted-foreground">
-                  ID: {{ selectedProvider.sellID }}
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-muted-foreground">节点ID:</span>
+                  <span class="font-medium">{{ selectedProvider.sellID }}</span>
                 </div>
-                <div class="text-sm text-muted-foreground">
-                  地址: {{ selectedProvider.providerAddress }}
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-muted-foreground">提供商地址:</span>
+                  <span class="font-mono">{{ selectedProvider.providerAddress }}</span>
                 </div>
-              </div>
-
-              <div class="space-y-2">
-                <h4 class="font-medium">存储详情</h4>
-                <div class="text-sm text-muted-foreground">
-                  可用空间: {{ selectedProvider.availableSpace }} MB
-                </div>
-                <div class="text-sm text-muted-foreground">
-                  每月价格: {{ formatEther(selectedProvider.pricePerMBPerMonth) }} ETH/MB
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-muted-foreground">信誉等级:</span>
+                  <Badge :variant="getReputationVariant(selectedProvider.reputation)">
+                    {{ getReputationLabel(selectedProvider.reputation) }}
+                  </Badge>
                 </div>
               </div>
 
+              <Separator />
+
+              <div class="space-y-4">
+                <h4 class="font-medium">存储配置</h4>
+                
+                <div class="space-y-2">
+                  <Label>购买空间</Label>
+                  <div class="flex gap-4">
+                    <Input
+                      v-model="selectedProvider.availableSpace"
+                      type="number"
+                      class="flex-2"
+                    />
+                    <Select v-model="purchaseUnit" class="w-32">
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="MB">MB</SelectItem>
+                        <SelectItem value="GB">GB</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <Label>存储时长</Label>
+                  <Select v-model="purchaseDuration">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value='1'>1个月</SelectItem>
+                      <SelectItem value='3'>3个月</SelectItem>
+                      <SelectItem value='6'>6个月</SelectItem>
+                      <SelectItem value='12'>12个月</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <Separator />
+
               <div class="space-y-2">
-                <h4 class="font-medium">总价</h4>
-                <div class="text-lg font-bold">
-                  {{ calculateTotalCost(selectedProvider) }} ETH
+                <h4 class="font-medium">费用明细</h4>
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between text-sm">
+                    <span class="text-muted-foreground">单价:</span>
+                    <span>{{ formatEther(selectedProvider.pricePerMBPerMonth) }} ETH/MB/月</span>
+                  </div>
+                  <div class="flex items-center justify-between text-sm">
+                    <span class="text-muted-foreground">空间:</span>
+                    <span>{{ purchaseAmount }} {{ purchaseUnit }}</span>
+                  </div>
+                  <div class="flex items-center justify-between text-sm">
+                    <span class="text-muted-foreground">时长:</span>
+                    <span>{{ purchaseDuration }} 个月</span>
+                  </div>
+                  <Separator />
+                  <div class="flex items-center justify-between pt-2">
+                    <span class="font-medium">总计:</span>
+                    <span class="text-xl font-bold">
+                      {{ calculateTotalCost() }} ETH
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -89,9 +247,10 @@
                 取消
               </Button>
               <Button 
-                :disabled="isLoading" 
+                :disabled="isLoading || !isPurchaseValid" 
                 @click="handlePurchase"
               >
+                <Loader2Icon v-if="isLoading" class="w-4 h-4 mr-2 animate-spin" />
                 {{ isLoading ? '处理中...' : '确认购买' }}
               </Button>
             </div>
@@ -102,9 +261,8 @@
   </Dialog>
 </template>
 
-
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { ethers } from 'ethers'
 import { 
   Dialog, 
@@ -118,8 +276,42 @@ import {
   CardDescription 
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { ServerIcon } from 'lucide-vue-next'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
+import { Separator } from '@/components/ui/separator'
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@/components/ui/table'
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
+} from '@/components/ui/tabs'
+import { 
+  ServerIcon, 
+  HardDriveIcon, 
+  CoinsIcon,
+  RefreshCcwIcon,
+  LayoutGridIcon,
+  ListIcon,
+  Loader2Icon
+} from 'lucide-vue-next'
 import { useToast } from '@/components/ui/toast'
 import StorageMarketABI from '../../../../../contract/data-market/abi/StorageMarket.json'
 
@@ -130,6 +322,8 @@ interface StorageProvider {
   availableSpace: number
   pricePerMBPerMonth: ethers.BigNumber
   stakedETH: ethers.BigNumber
+  uptime: number
+  reputation: number
 }
 
 interface Props {
@@ -148,11 +342,55 @@ const selectedProvider = ref<StorageProvider | null>(null)
 const isPurchaseDialogOpen = ref(false)
 const isLoading = ref(false)
 const error = ref('')
+const sortBy = ref('price-asc')
+const purchaseAmount = ref(1)
+const purchaseUnit = ref('MB')
+const purchaseDuration = ref('1')
 const { toast } = useToast()
 
 // 合约相关配置
-const contractAddress = '0x0e9C8F895dc31c2b7E85ccA14252Fd3F02dB7B50'
-const contractABI = StorageMarketABI // 这里需要填入你的合约ABI
+const contractAddress = '0xe76DE1e72C90C92DbCcf2A2ab2De0a244C987f8a'
+const contractABI = StorageMarketABI
+
+// 计算属性
+const sortedProviders = computed(() => {
+  const sorted = [...providers.value]
+  switch (sortBy.value) {
+    case 'price-asc':
+      return sorted.sort((a, b) => a.pricePerMBPerMonth.lt(b.pricePerMBPerMonth) ? -1 : 1)
+    case 'price-desc':
+      return sorted.sort((a, b) => a.pricePerMBPerMonth.gt(b.pricePerMBPerMonth) ? -1 : 1)
+    case 'space-asc':
+      return sorted.sort((a, b) => a.availableSpace - b.availableSpace)
+    case 'space-desc':
+      return sorted.sort((a, b) => b.availableSpace - a.availableSpace)
+    default:
+      return sorted
+  }
+})
+
+const isPurchaseValid = computed(() => {
+  if (!selectedProvider.value) return false
+  if (purchaseAmount.value <= 0) return false
+  if (purchaseUnit.value === 'GB' && purchaseAmount.value * 1024 > selectedProvider.value.availableSpace) return false
+  if (purchaseUnit.value === 'MB' && purchaseAmount.value > selectedProvider.value.availableSpace) return false
+  return true
+})
+
+// 工具函数
+function getReputationVariant(reputation: number): string {
+  if (reputation >= 90) return 'default'
+  if (reputation >= 70) return 'secondary'
+  if (reputation >= 50) return 'outline'
+  return 'destructive'
+}
+
+function getReputationLabel(reputation: number): string {
+  if (reputation >= 90) return '优质节点'
+  if (reputation >= 70) return '良好节点'
+  if (reputation >= 50) return '一般节点'
+  return '风险节点'
+}
 
 // 主 Dialog 控制
 const updateDialogStatus = (value: boolean): void => {
@@ -165,6 +403,9 @@ const updatePurchaseDialogStatus = (value: boolean): void => {
   if (!value) {
     selectedProvider.value = null
     error.value = ''
+    purchaseAmount.value = 1
+    purchaseUnit.value = 'MB'
+    purchaseDuration.value = '1'
   }
 }
 
@@ -177,6 +418,27 @@ const openPurchaseDialog = (provider: StorageProvider): void => {
 // 关闭购买对话框
 const closePurchaseDialog = (): void => {
   updatePurchaseDialogStatus(false)
+}
+
+// 刷新数据
+const refreshData = async (): Promise<void> => {
+  isLoading.value = true
+  try {
+    await fetchProviders()
+    toast({
+      title: "刷新成功",
+      description: "数据已更新",
+      variant: "default"
+    })
+  } catch (err) {
+    toast({
+      title: "刷新失败",
+      description: err instanceof Error ? err.message : "未知错误",
+      variant: "destructive"
+    })
+  } finally {
+    isLoading.value = false
+  }
 }
 
 // 初始化
@@ -201,15 +463,46 @@ async function fetchProviders(): Promise<void> {
         sellID: 1,
         providerAddress: "0x123...abc",
         availableSpace: 1000,
-        pricePerMBPerMonth: ethers.utils.parseEther("0.001"),
-        stakedETH: ethers.utils.parseEther("1.0")
+        pricePerMBPerMonth: ethers.utils.parseEther("0.00001"),
+        stakedETH: ethers.utils.parseEther("1.0"),
+        uptime: 99.9,
+        reputation: 95
       },
       {
         sellID: 2,
         providerAddress: "0x456...def",
         availableSpace: 2000,
-        pricePerMBPerMonth: ethers.utils.parseEther("0.0015"),
-        stakedETH: ethers.utils.parseEther("2.0")
+        pricePerMBPerMonth: ethers.utils.parseEther("0.00015"),
+        stakedETH: ethers.utils.parseEther("2.0"),
+        uptime: 98.5,
+        reputation: 85
+      },
+      {
+        sellID: 3,
+        providerAddress: "0x789...ghi",
+        availableSpace: 5000,
+        pricePerMBPerMonth: ethers.utils.parseEther("0.00008"),
+        stakedETH: ethers.utils.parseEther("3.0"),
+        uptime: 95.0,
+        reputation: 75
+      },
+      {
+        sellID: 4,
+        providerAddress: "0xabc...123",
+        availableSpace: 3000,
+        pricePerMBPerMonth: ethers.utils.parseEther("0.00012"),
+        stakedETH: ethers.utils.parseEther("1.5"),
+        uptime: 92.0,
+        reputation: 65
+      },
+      {
+        sellID: 5,
+        providerAddress: "0xdef...456",
+        availableSpace: 1500,
+        pricePerMBPerMonth: ethers.utils.parseEther("0.00020"),
+        stakedETH: ethers.utils.parseEther("1.2"),
+        uptime: 88.0,
+        reputation: 45
       }
     ]
   } catch (err) {
@@ -223,22 +516,28 @@ async function fetchProviders(): Promise<void> {
   }
 }
 
-// 计算总成本
-function calculateTotalCost(provider: StorageProvider | null): string {
-  if (!provider) return '0'
-  const total = ethers.BigNumber.from(provider.pricePerMBPerMonth)
-    .mul(provider.availableSpace)
-  return formatEther(total)
-}
-
 // 格式化ETH显示
 function formatEther(value: ethers.BigNumber): string {
   return ethers.utils.formatEther(value)
 }
 
+// 计算总成本
+function calculateTotalCost(): string {
+  if (!selectedProvider.value) return '0'
+  
+  let totalMB = selectedProvider.value.availableSpace
+  if (purchaseUnit.value === 'GB') {
+    totalMB *= 1024
+  }
+  
+  const monthlyRate = selectedProvider.value.pricePerMBPerMonth
+  const total = monthlyRate.mul(totalMB).mul(purchaseDuration.value)
+  return formatEther(total)
+}
+
 // 处理购买
 async function handlePurchase(): Promise<void> {
-  if (!selectedProvider.value) return
+  if (!selectedProvider.value || !isPurchaseValid.value) return
 
   try {
     isLoading.value = true
@@ -253,20 +552,27 @@ async function handlePurchase(): Promise<void> {
     const signer = provider.getSigner()
     const contract = new ethers.Contract(contractAddress, contractABI, signer)
 
+    // 计算购买空间（转换为MB）
+    const spaceMB = purchaseUnit.value === 'GB' ? purchaseAmount.value * 1024 : purchaseAmount.value
+
     // 计算支付金额
     const totalCost = ethers.BigNumber.from(selectedProvider.value.pricePerMBPerMonth)
-      .mul(selectedProvider.value.availableSpace)
+      .mul(spaceMB)
+      .mul(purchaseDuration.value)
 
     // 创建订单
-    const tx = await contract.createDataOrder(selectedProvider.value.sellID, {
-      value: totalCost
-    })
+    const tx = await contract.createDataOrder(
+      selectedProvider.value.sellID,
+      spaceMB,
+      purchaseDuration.value,
+      { value: totalCost }
+    )
     await tx.wait()
 
     // 成功提示
     toast({
       title: "购买成功",
-      description: "您的存储空间已购买成功！",
+      description: `您已成功购买 ${purchaseAmount.value}${purchaseUnit.value} 存储空间，时长 ${purchaseDuration.value} 个月！`,
       variant: "default"
     })
 

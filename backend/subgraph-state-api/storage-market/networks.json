@@ -1,0 +1,8 @@
+{
+  "sepolia": {
+    "StorageMarket": {
+      "address": "0xe76DE1e72C90C92DbCcf2A2ab2De0a244C987f8a",
+      "startBlock": 1
+    }
+  }
+}

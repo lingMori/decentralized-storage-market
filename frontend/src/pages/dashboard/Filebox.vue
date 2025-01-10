@@ -91,13 +91,12 @@ const loadUserInfoFromGraph = async() => {
 
     // 查询所有文件并统计大小：
     const totalSize = result2.files.reduce((acc, cur) => acc + Number(cur.size), 0)
-
    // 更新用户存储信息
    userStorage.value = {
      totalStorage: Number(result.user.maxLoad )|| 0,
      usedStorage: totalSize || 0 // 假设GraphQLUser有usedStorage字段
    }
-   
+
    isLoading.value = false
  } catch (error) {
    console.error('Error loading user info:', error)
@@ -120,6 +119,7 @@ const loadFilesFromGraph = async () => {
       return {
         name: file.fileName,
         cid: file.cid,
+        storageSource: file.storageSource,
         status: `${file.isActive? 'active': 'removed'}`,
         lastModified: file.lastUpdated.toString(),
         size: file.size.toString(),

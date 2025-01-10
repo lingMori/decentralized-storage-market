@@ -129,6 +129,7 @@ export const useFileUpload = () => {
       status: 'active',
       lastModified: file.lastModified.toString(),
       size: file.size.toString(),
+      storageSource: responseChain.sourceID,
       type: file.type,
     } as FileItem;
   };

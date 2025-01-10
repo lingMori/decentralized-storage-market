@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import instaABI from "../../../../contract/data-market/abi/InstaShare.json"
+import instaABI from "../../../../contract/data-market/abi/InstaShare_v2.json"
 import { contractAddress } from "@/configs/CONTRACT_ADDRESS";
 import type { InstaShareHook, InstaShareContract } from "./type";
 

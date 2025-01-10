@@ -9,6 +9,7 @@ contract DataMarketplace {
         uint256 availableSpace; // 可用存储空间 (MB)
         uint256 pricePerMBPerMonth; // 每MB每月的价格 (wei)
         uint256 stakedETH; // 质押的 ETH (wei)
+        bool isValid; // 存储提供商是否有效
     }
 
     struct DataOrder {
@@ -67,6 +68,7 @@ contract DataMarketplace {
         provider.availableSpace = availableSpace;
         provider.pricePerMBPerMonth = pricePerMBPerMonth;
         provider.stakedETH = msg.value;
+        provider.isValid = true;
 
           // 触发事件
         emit StorageProviderRegistered(sellID, msg.sender, availableSpace, pricePerMBPerMonth, msg.value);
@@ -75,6 +77,9 @@ contract DataMarketplace {
    function createDataOrder(uint256 sellID) public payable {
         // 验证存储服务提供商是否存在
         require(storageProviders[sellID].providerAddress != address(0), "Storage provider not found");
+
+        // 验证存储服务提供商是否有效
+        require(storageProviders[sellID].isValid, "Storage provider is not valid");
 
         // 获取存储提供商信息
         StorageProvider storage provider = storageProviders[sellID];
@@ -124,6 +129,26 @@ contract DataMarketplace {
         );
     }
     
+    function getValidProviderSellIDs() public view returns (uint256[] memory) {
+        uint256 validProviderCount = 0;
+        // 计算有效的 provider 数量
+        for (uint256 i = 1; i <= nextSellID; i++) {
+            if (storageProviders[i].isValid) {
+                validProviderCount++;
+            }
+        }
+        // 创建数组来存储有效的 sellID
+        uint256[] memory result = new uint256[](validProviderCount);
+        uint256 resultIndex = 0;
+
+        for (uint256 i = 1; i <= nextSellID; i++) {
+            if (storageProviders[i].isValid) {
+                result[resultIndex] = i;
+                resultIndex++;
+              }
+          }
+        return result;
+    }
 
     function getProviderInfo(uint256 sellID) public view returns (StorageProvider memory){
         return storageProviders[sellID];

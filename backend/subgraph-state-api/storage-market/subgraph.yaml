@@ -1,0 +1,29 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: StorageMarket
+    network: sepolia
+    source:
+      address: "0xe76DE1e72C90C92DbCcf2A2ab2De0a244C987f8a"
+      abi: StorageMarket
+      startBlock: 1
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - DataOrderCreated
+        - StorageProviderRegistered
+      abis:
+        - name: StorageMarket
+          file: ./abis/StorageMarket.json
+      eventHandlers:
+        - event: DataOrderCreated(uint256,address,address,uint256,uint256,uint256,address)
+          handler: handleDataOrderCreated
+        - event: StorageProviderRegistered(uint256,address,uint256,uint256,uint256)
+          handler: handleStorageProviderRegistered
+      file: ./src/storage-market.ts

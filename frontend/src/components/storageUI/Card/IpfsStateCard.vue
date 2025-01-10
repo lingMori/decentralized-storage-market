@@ -121,6 +121,7 @@ import IpfsStateChar from '../Chart/IpfsStateChar.vue'
 // IPFS client configuration
 const ipfsClient = inject('dangoRPC') as KuboRPCClient
 
+
 // Reactive state variables
 const nodeStatus = ref('offline')
 const nodeInfo = ref({

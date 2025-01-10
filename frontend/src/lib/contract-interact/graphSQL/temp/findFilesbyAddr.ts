@@ -11,6 +11,7 @@ export const findFilesbyAddr = (address: string):string => {
       }
       size
       fileName
+      storageSource
       fileType
       isActive
       lastUpdated

@@ -1,0 +1,276 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "orderID",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "providerAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "buyerAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "storageSpace",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "totalCost",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "stakedETH",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "verificationContract",
+        "type": "address"
+      }
+    ],
+    "name": "DataOrderCreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "sellID",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "providerAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "availableSpace",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "pricePerMBPerMonth",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "stakedETH",
+        "type": "uint256"
+      }
+    ],
+    "name": "StorageProviderRegistered",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "sellID", "type": "uint256" }
+    ],
+    "name": "createDataOrder",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "dataOrders",
+    "outputs": [
+      { "internalType": "uint256", "name": "orderID", "type": "uint256" },
+      {
+        "internalType": "address",
+        "name": "providerAddress",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "buyerAddress", "type": "address" },
+      { "internalType": "uint256", "name": "storageSpace", "type": "uint256" },
+      { "internalType": "uint256", "name": "totalCost", "type": "uint256" },
+      { "internalType": "uint256", "name": "stakedETH", "type": "uint256" },
+      {
+        "internalType": "address",
+        "name": "verificationContract",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "orderID", "type": "uint256" }
+    ],
+    "name": "getOrderInfo",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "orderID", "type": "uint256" },
+          {
+            "internalType": "address",
+            "name": "providerAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "buyerAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "storageSpace",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "totalCost", "type": "uint256" },
+          { "internalType": "uint256", "name": "stakedETH", "type": "uint256" },
+          {
+            "internalType": "address",
+            "name": "verificationContract",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct DataMarketplace.DataOrder",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "sellID", "type": "uint256" }
+    ],
+    "name": "getProviderInfo",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "sellID", "type": "uint256" },
+          {
+            "internalType": "address",
+            "name": "providerAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "availableSpace",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "pricePerMBPerMonth",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "stakedETH", "type": "uint256" },
+          { "internalType": "bool", "name": "isValid", "type": "bool" }
+        ],
+        "internalType": "struct DataMarketplace.StorageProvider",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getValidProviderSellIDs",
+    "outputs": [
+      { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "orderID", "type": "uint256" }
+    ],
+    "name": "getVerificationContractAddress",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "nextOrderID",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "nextSellID",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "availableSpace",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "pricePerMBPerMonth",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "allowedDeviationPercentage",
+        "type": "uint256"
+      }
+    ],
+    "name": "registerStorageProvider",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "storageProviders",
+    "outputs": [
+      { "internalType": "uint256", "name": "sellID", "type": "uint256" },
+      {
+        "internalType": "address",
+        "name": "providerAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "availableSpace",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "pricePerMBPerMonth",
+        "type": "uint256"
+      },
+      { "internalType": "uint256", "name": "stakedETH", "type": "uint256" },
+      { "internalType": "bool", "name": "isValid", "type": "bool" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

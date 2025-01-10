@@ -239,11 +239,29 @@
 						"internalType": "uint256",
 						"name": "stakedETH",
 						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "isValid",
+						"type": "bool"
 					}
 				],
 				"internalType": "struct DataMarketplace.StorageProvider",
 				"name": "",
 				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getValidProviderSellIDs",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
 			}
 		],
 		"stateMutability": "view",
@@ -351,6 +369,11 @@
 				"internalType": "uint256",
 				"name": "stakedETH",
 				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "isValid",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",

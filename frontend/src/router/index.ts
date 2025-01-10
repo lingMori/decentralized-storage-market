@@ -43,6 +43,11 @@ const routes: RouteRecordRaw[] = [
         name: 'Home',
         redirect: '/dashboard/upload'
     },
+    {
+        path: '/test',
+        name: 'Test',
+        component: () => import("@/pages/dashboard/Test.vue")
+    },
     // 添加通配符路由
     {
         path: '/:pathMatch(.*)*',

@@ -6,6 +6,7 @@ export interface FileInfo {
   size: ethers.BigNumber;
   timestamp: ethers.BigNumber;
   fileType: string;
+  storageSource: string;
   isActive: boolean;
   exists: boolean;
 }
@@ -71,6 +72,7 @@ export interface InstaShareContract extends ethers.Contract {
     cid: string,
     fileSize: ethers.BigNumber,
     fileType: string,
+    storageSource: string,
     fileName: string
   ): Promise<ethers.ContractTransaction>;
 
