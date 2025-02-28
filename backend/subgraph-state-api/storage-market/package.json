@@ -4,10 +4,10 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ storage-market",
-    "create-local": "graph create --node http://localhost:8020/ storage-market",
-    "remove-local": "graph remove --node http://localhost:8020/ storage-market",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 storage-market",
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ storageMarketOrders",
+    "create-local": "graph create --node http://111.119.239.159:18020/ storageMarketOrders",
+    "remove-local": "graph remove --node http://111.119.239.159:18020/ storageMarketOrders",
+    "deploy-local": "graph deploy --node http://111.119.239.159:18020/ --ipfs http://111.119.239.159:7001 storageMarketOrders",
     "test": "graph test"
   },
   "dependencies": {

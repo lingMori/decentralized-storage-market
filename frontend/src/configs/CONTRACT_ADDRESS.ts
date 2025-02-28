@@ -1,2 +1,2 @@
-export const contractAddress = "0x2D8593d5f03fb0Ce88A464c7c3cc97e10AF04aBE"
-export const contractAddress_PublicShareSimple = "0x536D5Aa122ffe4f67dADac324C14F3E12C25b0eD"  //已迁移
+export const contractAddress = "0x8a68151b9f16Cb8Be5171AFe33FBDeab89cd6270"
+export const contractAddress_PublicShareSimple = "0x1f9F9485E791407F4bd7430A9d9f516B7F44E855"  //已迁移

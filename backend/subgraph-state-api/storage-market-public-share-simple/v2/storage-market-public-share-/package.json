@@ -4,10 +4,10 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ simpleStorage",
-    "create-local": "graph create --node http://111.119.239.159:18020/ simpleStorage",
-    "remove-local": "graph remove --node http://111.119.239.159:18020/ simpleStorage",
-    "deploy-local": "graph deploy --node http://111.119.239.159:18020/ --ipfs http://111.119.239.159:7001 simpleStorage",
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ simpleStorage_v2",
+    "create-local": "graph create --node http://111.119.239.159:18020/ simpleStorage_v2",
+    "remove-local": "graph remove --node http://111.119.239.159:18020/ simpleStorage_v2",
+    "deploy-local": "graph deploy --node http://111.119.239.159:18020/ --ipfs http://111.119.239.159:7001 simpleStorage_v2",
     "test": "graph test"
   },
   "dependencies": {

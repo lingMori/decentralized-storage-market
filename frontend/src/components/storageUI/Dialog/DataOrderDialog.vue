@@ -61,7 +61,7 @@
                       <div class="space-y-2">
                         <div class="flex items-center gap-2">
                           <ServerIcon class="h-5 w-5 text-muted-foreground" />
-                          <div class="font-medium truncate">{{ provider.providerAddress }}</div>
+                          <div class="font-medium truncate">{{ shortenAddress(provider.providerAddress) }}</div>
                         </div>
                         
                         <div class="flex items-center gap-2">
@@ -71,7 +71,7 @@
 
                         <div class="flex items-center gap-2">
                           <CoinsIcon class="h-5 w-5 text-muted-foreground" />
-                          <div class="font-medium">{{ formatEther(provider.stakedETH) }} ETH 质押</div>
+                          <div class="font-medium">{{ formatPrice(provider.stakedETH) }} ETH 质押</div>
                         </div>
                       </div>
 
@@ -80,7 +80,7 @@
                       <div class="flex items-center justify-between">
                         <div class="text-sm text-muted-foreground">每月价格</div>
                         <div class="text-lg font-bold">
-                          {{ formatEther(provider.pricePerMBPerMonth) }} ETH/MB
+                          {{ formatPrice(provider.pricePerMBPerMonth) }} ETH/MB
                         </div>
                       </div>
 
@@ -113,10 +113,10 @@
                 <TableBody>
                   <TableRow v-for="provider in sortedProviders" :key="provider.sellID">
                     <TableCell>{{ provider.sellID }}</TableCell>
-                    <TableCell class="font-mono">{{ provider.providerAddress }}</TableCell>
+                    <TableCell class="font-mono">{{ shortenAddress(provider.providerAddress)}}</TableCell>
                     <TableCell>{{ provider.availableSpace }} MB</TableCell>
-                    <TableCell>{{ formatEther(provider.pricePerMBPerMonth) }} ETH/MB</TableCell>
-                    <TableCell>{{ formatEther(provider.stakedETH) }} ETH</TableCell>
+                    <TableCell>{{ formatPrice(provider.pricePerMBPerMonth) }} ETH/MB</TableCell>
+                    <TableCell>{{ formatPrice(provider.stakedETH) }} ETH</TableCell>
                     <TableCell>{{ provider.uptime }}%</TableCell>
                     <TableCell>
                       <Badge :variant="getReputationVariant(provider.reputation)">
@@ -159,7 +159,7 @@
                 </div>
                 <div class="flex items-center justify-between text-sm">
                   <span class="text-muted-foreground">提供商地址:</span>
-                  <span class="font-mono">{{ selectedProvider.providerAddress }}</span>
+                  <span class="font-mono">{{ shortenAddress(selectedProvider.providerAddress) }}</span>
                 </div>
                 <div class="flex items-center justify-between text-sm">
                   <span class="text-muted-foreground">信誉等级:</span>
@@ -314,6 +314,9 @@ import {
 } from 'lucide-vue-next'
 import { useToast } from '@/components/ui/toast'
 import StorageMarketABI from '../../../../../contract/data-market/abi/StorageMarket.json'
+import { createGraphqlClient } from '@/lib/contract-interact/graphSQL/client/graphqlClient'
+import { findProviders } from '@/lib/contract-interact/graphSQL/temp/findProviders'
+import { SUBGRAPH_API_StorageMarketOrder } from '@/configs/SUBGRAPH_API'
 
 // 类型定义
 interface StorageProvider {
@@ -352,14 +355,29 @@ const { toast } = useToast()
 const contractAddress = '0xe76DE1e72C90C92DbCcf2A2ab2De0a244C987f8a'
 const contractABI = StorageMarketABI
 
+const fetchAllDataProviders = async():Promise<StorageProvider[]> => {
+  const client = createGraphqlClient(SUBGRAPH_API_StorageMarketOrder, findProviders());
+  const response = await client as { storageProviders:StorageProvider[] };
+  // console.log(response.storageProviders);
+  return response.storageProviders;
+}
+
 // 计算属性
 const sortedProviders = computed(() => {
   const sorted = [...providers.value]
   switch (sortBy.value) {
     case 'price-asc':
-      return sorted.sort((a, b) => a.pricePerMBPerMonth.lt(b.pricePerMBPerMonth) ? -1 : 1)
+      return sorted.sort((a, b) => {
+        const priceA = ethers.BigNumber.from(a.pricePerMBPerMonth)
+        const priceB = ethers.BigNumber.from(b.pricePerMBPerMonth)
+        return priceA.lt(priceB) ? -1 : 1
+      })
     case 'price-desc':
-      return sorted.sort((a, b) => a.pricePerMBPerMonth.gt(b.pricePerMBPerMonth) ? -1 : 1)
+      return sorted.sort((a, b) => {
+        const priceA = ethers.BigNumber.from(a.pricePerMBPerMonth)
+        const priceB = ethers.BigNumber.from(b.pricePerMBPerMonth)
+        return priceA.gt(priceB) ? -1 : 1
+      })
     case 'space-asc':
       return sorted.sort((a, b) => a.availableSpace - b.availableSpace)
     case 'space-desc':
@@ -378,7 +396,7 @@ const isPurchaseValid = computed(() => {
 })
 
 // 工具函数
-function getReputationVariant(reputation: number): string {
+function getReputationVariant(reputation: number): "offline" | "default" | "secondary" | "outline" | "destructive" | "pending" | "processing" | "completed" | "failed" | "online" | "away" | "busy" | null | undefined {
   if (reputation >= 90) return 'default'
   if (reputation >= 70) return 'secondary'
   if (reputation >= 50) return 'outline'
@@ -440,12 +458,6 @@ const refreshData = async (): Promise<void> => {
     isLoading.value = false
   }
 }
-
-// 初始化
-onMounted(async (): Promise<void> => {
-  await fetchProviders()
-})
-
 // 获取存储提供商列表
 async function fetchProviders(): Promise<void> {
   try {
@@ -458,53 +470,8 @@ async function fetchProviders(): Promise<void> {
     const contract = new ethers.Contract(contractAddress, contractABI, provider)
 
     // 模拟数据 - 实际使用时替换为合约调用
-    providers.value = [
-      {
-        sellID: 1,
-        providerAddress: "0x123...abc",
-        availableSpace: 1000,
-        pricePerMBPerMonth: ethers.utils.parseEther("0.00001"),
-        stakedETH: ethers.utils.parseEther("1.0"),
-        uptime: 99.9,
-        reputation: 95
-      },
-      {
-        sellID: 2,
-        providerAddress: "0x456...def",
-        availableSpace: 2000,
-        pricePerMBPerMonth: ethers.utils.parseEther("0.00015"),
-        stakedETH: ethers.utils.parseEther("2.0"),
-        uptime: 98.5,
-        reputation: 85
-      },
-      {
-        sellID: 3,
-        providerAddress: "0x789...ghi",
-        availableSpace: 5000,
-        pricePerMBPerMonth: ethers.utils.parseEther("0.00008"),
-        stakedETH: ethers.utils.parseEther("3.0"),
-        uptime: 95.0,
-        reputation: 75
-      },
-      {
-        sellID: 4,
-        providerAddress: "0xabc...123",
-        availableSpace: 3000,
-        pricePerMBPerMonth: ethers.utils.parseEther("0.00012"),
-        stakedETH: ethers.utils.parseEther("1.5"),
-        uptime: 92.0,
-        reputation: 65
-      },
-      {
-        sellID: 5,
-        providerAddress: "0xdef...456",
-        availableSpace: 1500,
-        pricePerMBPerMonth: ethers.utils.parseEther("0.00020"),
-        stakedETH: ethers.utils.parseEther("1.2"),
-        uptime: 88.0,
-        reputation: 45
-      }
-    ]
+    providers.value = await fetchAllDataProviders()
+    
   } catch (err) {
     error.value = "获取提供商列表失败"
     toast({
@@ -514,6 +481,15 @@ async function fetchProviders(): Promise<void> {
     })
     console.error(err)
   }
+}
+
+function shortenAddress(address: string): string {
+  return address ? `${address.slice(0, 6)}...${address.slice(-4)}` : ''
+}
+
+function formatPrice(value: ethers.BigNumber, decimals: number = 4): string {
+  const formattedValue = ethers.utils.formatEther(value);
+  return parseFloat(formattedValue).toFixed(decimals);
 }
 
 // 格式化ETH显示
@@ -530,7 +506,7 @@ function calculateTotalCost(): string {
     totalMB *= 1024
   }
   
-  const monthlyRate = selectedProvider.value.pricePerMBPerMonth
+  const monthlyRate = ethers.BigNumber.from(selectedProvider.value.pricePerMBPerMonth)
   const total = monthlyRate.mul(totalMB).mul(purchaseDuration.value)
   return formatEther(total)
 }
@@ -591,4 +567,10 @@ async function handlePurchase(): Promise<void> {
     isLoading.value = false
   }
 }
+
+
+onMounted(async() => {
+  // await fetchAllDataProviders()
+  await fetchProviders()
+})
 </script>

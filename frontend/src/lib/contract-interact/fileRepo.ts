@@ -27,7 +27,7 @@ export const fileRepo = (): {
     try {
       const contract = getContract();
       const serverID = ipfsStore.getCurrentNode?.id
-      // console.log("file uploaded", file); // test file object
+      console.log("file uploaded", file); // test file object
       const tx = await contract.uploadFile(file.cid, file.fileSize, file.fileType, serverID ?? '', file.fileName); // 确保等待交易完成
       await tx.wait();
       return { success: true, sourceID:serverID } as FileRepoResponse;

@@ -8,7 +8,7 @@ dataSources:
     name: InstaShare
     network: buaanet
     source:
-      address: "0x2D8593d5f03fb0Ce88A464c7c3cc97e10AF04aBE"
+      address: "0x8a68151b9f16Cb8Be5171AFe33FBDeab89cd6270"
       abi: InstaShare
       startBlock: 1
     mapping:

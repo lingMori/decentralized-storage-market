@@ -1,25 +1,42 @@
-type DataOrderCreated @entity(immutable: true) {
-  id: Bytes!
-  orderID: BigInt! # uint256
-  providerAddress: Bytes! # address
-  buyerAddress: Bytes! # address
-  storageSpace: BigInt! # uint256
-  totalCost: BigInt! # uint256
-  stakedETH: BigInt! # uint256
-  verificationContract: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+type StorageProvider @entity {
+  id: ID!
+  sellID: BigInt!
+  providerAddress: Bytes!
+  availableSpace: BigInt!
+  pricePerMBPerMonth: BigInt!
+  stakedETH: BigInt!
+  isValid: Boolean!
+  orders: [DataOrder!]! @derivedFrom(field: "provider")
+  createdAt: BigInt!
+  updatedAt: BigInt!
 }
 
-type StorageProviderRegistered @entity(immutable: true) {
-  id: Bytes!
-  sellID: BigInt! # uint256
-  providerAddress: Bytes! # address
-  availableSpace: BigInt! # uint256
-  pricePerMBPerMonth: BigInt! # uint256
-  stakedETH: BigInt! # uint256
+type DataOrder @entity {
+  id: ID!
+  orderID: BigInt!
+  provider: StorageProvider!
+  buyerAddress: Bytes!
+  storageSpace: BigInt!
+  totalCost: BigInt!
+  stakedETH: BigInt!
+  verificationContract: Bytes!
+  createdAt: BigInt!
+  files: [StorageFile!]! @derivedFrom(field: "order")
+}
+
+type StorageFile @entity {
+  id: ID!
+  fileIndex: BigInt!
+  fileCid: String!
+  fileSize: BigInt!
+  order: DataOrder!
+  verifications: [FileVerification!]! @derivedFrom(field: "file")
+}
+
+type FileVerification @entity {
+  id: ID!
+  file: StorageFile!
+  timestamp: BigInt!
   blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+  result: Bytes!
 }

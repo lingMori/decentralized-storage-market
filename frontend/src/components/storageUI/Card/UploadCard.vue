@@ -154,7 +154,7 @@ const uploadFileHandler = async (file: File): Promise<FileItem> => {
         console.log(`Uploading... ${Math.round((progress / file.size) * 100)}%`);
       }
     });
-    // console.log("草泥马的cid: ", responseIPFS.cid.toString())
+    console.log("草泥马的cid: ", responseIPFS.cid.toString())
   } catch (error) {
     console.log('IPFS upload error:', error);
     return {} as FileItem;
