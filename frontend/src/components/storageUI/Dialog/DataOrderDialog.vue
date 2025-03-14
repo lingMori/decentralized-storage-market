@@ -181,8 +181,9 @@
                       v-model="selectedProvider.availableSpace"
                       type="number"
                       class="flex-2"
+                      :disabled=true
                     />
-                    <Select v-model="purchaseUnit" class="w-32">
+                    <Select v-model="purchaseUnit" class="w-32" :disabled="purchaseUnit !== ''">
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
