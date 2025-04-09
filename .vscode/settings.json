@@ -1,13 +1,16 @@
 {
     // ========== Visuals ==========
     "editor.cursorSmoothCaretAnimation": "on",
-    "editor.fontFamily": "Input Mono, monospace",
-    "terminal.integrated.fontFamily": "Hack Nerd Font",
+    // "editor.fontFamily": "Input Mono, monospace",
+    "editor.fontFamily": "Maple Mono NF",
+    "terminal.integrated.fontFamily": "Maple Mono NF",
+    "terminal.integrated.fontSize": 12,
+    // "terminal.integrated.fontWeightBold": "bold",
     "editor.guides.bracketPairs": "active",
     "editor.lineNumbers": "interval",
     "editor.renderWhitespace": "boundary",
     "window.autoDetectColorScheme": false,  // 自动检测当前环境theme（macOS）
-    "workbench.colorTheme": "Vitesse Light Soft",
+    "workbench.colorTheme": "Vitesse Dark",
     "workbench.editor.tabActionLocation": "left",
     "workbench.fontAliasing": "antialiased",
     "workbench.iconTheme": "catppuccin-macchiato",

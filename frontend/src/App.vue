@@ -9,7 +9,10 @@
 import walletModel from './lib/web3-wallect';
 import useLocalStorage from './store/localStorageDB';
 import { Toaster } from '@/components/ui/sonner'
+
 const model = walletModel;
+
+model.setThemeMode('dark');
 const localStorageDB = useLocalStorage();
 localStorageDB.clearCache();
 

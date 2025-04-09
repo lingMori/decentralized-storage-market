@@ -540,8 +540,6 @@ async function handlePurchase(): Promise<void> {
     // 创建订单
     const tx = await contract.createDataOrder(
       selectedProvider.value.sellID,
-      spaceMB,
-      purchaseDuration.value,
       { value: totalCost }
     )
     await tx.wait()

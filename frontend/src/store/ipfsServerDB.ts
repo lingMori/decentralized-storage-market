@@ -71,6 +71,9 @@ export const useIPFSStore = defineStore('ipfs', {
     },
 
     async fetchAvaliableNodes(url: string) {
+      // TODO : fetch ipfs nodes of users 
+      // nodes can be fetch with { userAddress: string, signature: string, commitment: string }
+      // ask server or contract with this message to get nodes
       try {
         const response = await fetch(url)
         if (!response.ok){
