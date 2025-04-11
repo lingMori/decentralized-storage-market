@@ -134,6 +134,8 @@ contract InstaShare {
             revert AlreadyRegistered();
         }
 
+        // 现在的insta-share的逻辑是对所有用户只注册一次，然后对所有文件按照storageSource存储在服务器上
+
         InstanceOwner storage newOwner = instanceOwners[msg.sender];
         newOwner.ownerAddress = msg.sender;
         newOwner.freeLoad = 0; // 初始空间为0，需要链接订单

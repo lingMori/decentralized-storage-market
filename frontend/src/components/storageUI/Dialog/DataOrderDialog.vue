@@ -139,8 +139,8 @@
   </Dialog>
 
   <!-- 购买确认对话框 -->
-  <Dialog :open="isPurchaseDialogOpen" @update:open="val => updatePurchaseDialogStatus(val)" class="w-[800px]">
-    <DialogContent v-if="selectedProvider">
+  <Dialog :open="isPurchaseDialogOpen" @update:open="val => updatePurchaseDialogStatus(val)" class="max-h-[90vh] w-[800px]">
+    <DialogContent v-if="selectedProvider" class="max-h-[90vh] overflow-y-scroll">
       <Card class="w-full border-0 shadow-none">
         <CardHeader>
           <CardTitle class="text-2xl font-bold">购买存储空间</CardTitle>
@@ -508,7 +508,7 @@ function calculateTotalCost(): string {
   }
   
   const monthlyRate = ethers.BigNumber.from(selectedProvider.value.pricePerMBPerMonth)
-  const total = monthlyRate.mul(totalMB).mul(purchaseDuration.value)
+  const total = monthlyRate.mul(totalMB)
   return formatEther(total)
 }
 
