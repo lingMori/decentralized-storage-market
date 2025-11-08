@@ -1,0 +1,33 @@
+type DataOrderCreated @entity(immutable: true) {
+  id: Bytes!
+  orderID: BigInt! # uint256
+  providerAddress: Bytes! # address
+  buyerAddress: Bytes! # address
+  storageSpace: BigInt! # uint256
+  totalCost: BigInt! # uint256
+  stakedETH: BigInt! # uint256
+  verificationContract: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type InstaShareContractUpdated @entity(immutable: true) {
+  id: Bytes!
+  newAddress: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type StorageProviderRegistered @entity(immutable: true) {
+  id: Bytes!
+  sellID: BigInt! # uint256
+  providerAddress: Bytes! # address
+  availableSpace: BigInt! # uint256
+  pricePerMBPerMonth: BigInt! # uint256
+  stakedETH: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
