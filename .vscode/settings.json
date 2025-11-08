@@ -22,6 +22,10 @@
     "workbench.startupEditor": "newUntitledFile",
     "workbench.tree.expandMode": "singleClick",
     "workbench.tree.indent": 10,
+
+    // ========== SwiftConfig ==========
+
+
   
     // ========== Editor ========== 
     "debug.onTaskErrors": "debugAnyway",

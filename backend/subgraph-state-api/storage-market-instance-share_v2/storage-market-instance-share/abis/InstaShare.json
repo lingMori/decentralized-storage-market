@@ -1,0 +1,564 @@
+[
+  { "type": "constructor", "inputs": [], "stateMutability": "nonpayable" },
+  { "name": "AlreadyRegistered", "type": "error", "inputs": [] },
+  { "name": "FileAlreadyExists", "type": "error", "inputs": [] },
+  { "name": "FileNotFound", "type": "error", "inputs": [] },
+  { "name": "InstanceLocked", "type": "error", "inputs": [] },
+  { "name": "InsufficientFreeLoad", "type": "error", "inputs": [] },
+  { "name": "InsufficientNodeSpace", "type": "error", "inputs": [] },
+  { "name": "InvalidCID", "type": "error", "inputs": [] },
+  { "name": "InvalidFileSize", "type": "error", "inputs": [] },
+  { "name": "NotOwner", "type": "error", "inputs": [] },
+  { "name": "NotPaused", "type": "error", "inputs": [] },
+  { "name": "NotRegistered", "type": "error", "inputs": [] },
+  { "name": "Paused", "type": "error", "inputs": [] },
+  { "name": "ReentrantCall", "type": "error", "inputs": [] },
+  { "name": "StorageNodeAlreadyExists", "type": "error", "inputs": [] },
+  { "name": "StorageNodeInactive", "type": "error", "inputs": [] },
+  { "name": "StorageNodeNotFound", "type": "error", "inputs": [] },
+  {
+    "name": "FileRemoved",
+    "type": "event",
+    "inputs": [
+      {
+        "name": "owner",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "cid",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "name": "FileStatusUpdated",
+    "type": "event",
+    "inputs": [
+      {
+        "name": "owner",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "cid",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "isActive",
+        "type": "bool",
+        "indexed": false,
+        "internalType": "bool"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "name": "FileUploaded",
+    "type": "event",
+    "inputs": [
+      {
+        "name": "owner",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "cid",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "size",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "fileType",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "fileName",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "storageNodeId",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "name": "FreeLoadUpdated",
+    "type": "event",
+    "inputs": [
+      {
+        "name": "ownerAddress",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "freeLoad",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "name": "InstanceLockStatusUpdated",
+    "type": "event",
+    "inputs": [
+      {
+        "name": "owner",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "indexed": false,
+        "internalType": "bool"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "name": "InstanceOwnerRegistered",
+    "type": "event",
+    "inputs": [
+      {
+        "name": "ownerAddress",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "freeLoad",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "indexed": false,
+        "internalType": "bool"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "name": "MaxLoadUpdated",
+    "type": "event",
+    "inputs": [
+      {
+        "name": "newMaxLoad",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "ownerAddress",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "name": "StorageNodeAdded",
+    "type": "event",
+    "inputs": [
+      {
+        "name": "owner",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "nodeId",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "providerAddress",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "totalSpace",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "name": "StorageNodeDeactivated",
+    "type": "event",
+    "inputs": [
+      {
+        "name": "owner",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "nodeId",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "name": "StorageNodeUpdated",
+    "type": "event",
+    "inputs": [
+      {
+        "name": "owner",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "nodeId",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "usedSpace",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "availableSpace",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "name": "addStorageNode",
+    "type": "function",
+    "inputs": [
+      { "name": "nodeId", "type": "uint256", "internalType": "uint256" },
+      {
+        "name": "providerAddress",
+        "type": "address",
+        "internalType": "address"
+      },
+      { "name": "totalSpace", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "batchRemoveFiles",
+    "type": "function",
+    "inputs": [
+      { "name": "cids", "type": "string[]", "internalType": "string[]" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "batchUploadFiles",
+    "type": "function",
+    "inputs": [
+      { "name": "cids", "type": "string[]", "internalType": "string[]" },
+      { "name": "fileSizes", "type": "uint256[]", "internalType": "uint256[]" },
+      { "name": "fileTypes", "type": "string[]", "internalType": "string[]" },
+      { "name": "fileNames", "type": "string[]", "internalType": "string[]" },
+      {
+        "name": "storageNodeIds",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "deactivateStorageNode",
+    "type": "function",
+    "inputs": [
+      { "name": "nodeId", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "getFileInfo",
+    "type": "function",
+    "inputs": [
+      { "name": "owner", "type": "address", "internalType": "address" },
+      { "name": "cid", "type": "string", "internalType": "string" }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "components": [
+          { "name": "cid", "type": "string", "internalType": "string" },
+          { "name": "size", "type": "uint256", "internalType": "uint256" },
+          { "name": "timestamp", "type": "uint256", "internalType": "uint256" },
+          { "name": "fileType", "type": "string", "internalType": "string" },
+          { "name": "isActive", "type": "bool", "internalType": "bool" },
+          { "name": "exists", "type": "bool", "internalType": "bool" },
+          {
+            "name": "storageNodeId",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ],
+        "internalType": "struct InstaShare.FileInfo"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "name": "getFileList",
+    "type": "function",
+    "inputs": [
+      { "name": "owner", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [{ "name": "", "type": "string[]", "internalType": "string[]" }],
+    "stateMutability": "view"
+  },
+  {
+    "name": "getFileStorageNode",
+    "type": "function",
+    "inputs": [
+      { "name": "owner", "type": "address", "internalType": "address" },
+      { "name": "cid", "type": "string", "internalType": "string" }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "view"
+  },
+  {
+    "name": "getNodeStats",
+    "type": "function",
+    "inputs": [
+      { "name": "ownerAddress", "type": "address", "internalType": "address" },
+      { "name": "nodeId", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [
+      { "name": "totalSpace", "type": "uint256", "internalType": "uint256" },
+      { "name": "usedSpace", "type": "uint256", "internalType": "uint256" },
+      {
+        "name": "availableSpace",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      { "name": "isActive", "type": "bool", "internalType": "bool" },
+      {
+        "name": "providerAddress",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "name": "getStorageNode",
+    "type": "function",
+    "inputs": [
+      { "name": "ownerAddress", "type": "address", "internalType": "address" },
+      { "name": "nodeId", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "components": [
+          { "name": "nodeId", "type": "uint256", "internalType": "uint256" },
+          {
+            "name": "providerAddress",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "totalSpace",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          { "name": "usedSpace", "type": "uint256", "internalType": "uint256" },
+          {
+            "name": "availableSpace",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          { "name": "isActive", "type": "bool", "internalType": "bool" },
+          {
+            "name": "purchaseTime",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ],
+        "internalType": "struct InstaShare.StorageNode"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "name": "getUserStats",
+    "type": "function",
+    "inputs": [
+      { "name": "owner", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [
+      { "name": "totalFiles", "type": "uint256", "internalType": "uint256" },
+      { "name": "freeLoad", "type": "uint256", "internalType": "uint256" },
+      { "name": "isLocked", "type": "bool", "internalType": "bool" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "name": "getUserStorageNodes",
+    "type": "function",
+    "inputs": [
+      { "name": "ownerAddress", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [
+      { "name": "", "type": "uint256[]", "internalType": "uint256[]" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "name": "instanceOwners",
+    "type": "function",
+    "inputs": [{ "name": "", "type": "address", "internalType": "address" }],
+    "outputs": [
+      { "name": "ownerAddress", "type": "address", "internalType": "address" },
+      { "name": "freeLoad", "type": "uint256", "internalType": "uint256" },
+      { "name": "maxLoad", "type": "uint256", "internalType": "uint256" },
+      { "name": "isLocked", "type": "bool", "internalType": "bool" },
+      { "name": "totalFiles", "type": "uint256", "internalType": "uint256" },
+      { "name": "totalNodes", "type": "uint256", "internalType": "uint256" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "name": "owner",
+    "type": "function",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+    "stateMutability": "view"
+  },
+  {
+    "name": "pause",
+    "type": "function",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "paused",
+    "type": "function",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }],
+    "stateMutability": "view"
+  },
+  {
+    "name": "registerInstanceOwner",
+    "type": "function",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "removeFile",
+    "type": "function",
+    "inputs": [{ "name": "cid", "type": "string", "internalType": "string" }],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "setInstanceLock",
+    "type": "function",
+    "inputs": [
+      { "name": "ownerAddress", "type": "address", "internalType": "address" },
+      { "name": "locked", "type": "bool", "internalType": "bool" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "transferOwnership",
+    "type": "function",
+    "inputs": [
+      { "name": "newOwner", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "unpause",
+    "type": "function",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "updateFileStatus",
+    "type": "function",
+    "inputs": [
+      { "name": "cid", "type": "string", "internalType": "string" },
+      { "name": "isActive", "type": "bool", "internalType": "bool" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "updateMaxLoad",
+    "type": "function",
+    "inputs": [
+      { "name": "newMaxLoad", "type": "uint256", "internalType": "uint256" },
+      { "name": "ownerAddress", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "uploadFile",
+    "type": "function",
+    "inputs": [
+      { "name": "cid", "type": "string", "internalType": "string" },
+      { "name": "fileSize", "type": "uint256", "internalType": "uint256" },
+      { "name": "fileType", "type": "string", "internalType": "string" },
+      { "name": "fileName", "type": "string", "internalType": "string" },
+      { "name": "storageNodeId", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  }
+]

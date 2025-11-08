@@ -17,7 +17,7 @@ if ! command -v docker &> /dev/null; then
 fi
 echo -e "${GREEN}Docker已安装√${NC}"
 
-# 设置目录
+# 设置目录create
 echo -e "${YELLOW}设置IPFS数据目录...${NC}"
 # 默认目录
 DEFAULT_STAGING_DIR="$HOME/ipfs/staging"

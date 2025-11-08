@@ -1,7 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
+interface IInstaShare {
+    function addStorageNode(uint256 nodeId, address providerAddress, uint256 totalSpace) external;
+}
+
 contract DataMarketplace {
+    address public instaShareContract; // InstaShare合约地址
     // --- 数据结构 ---
     struct StorageProvider {
         uint256 sellID; // 卖单ID
@@ -25,8 +30,10 @@ contract DataMarketplace {
     // --- 状态变量 ---
     mapping(uint256 => StorageProvider) public storageProviders; // 使用卖单ID映射到存储卖单信息
     mapping(uint256 => DataOrder) public dataOrders; // 使用订单ID映射到数据订单信息
+    mapping(address => uint256[]) public userOrders; // 用户购买的订单列表
     uint256 public nextSellID; // 用于生成唯一的卖单ID
     uint256 public nextOrderID; // 用于生成唯一的订单ID
+    address public owner; // 合约所有者
 
     // --- 事件 ---
     event StorageProviderRegistered(
@@ -46,6 +53,19 @@ contract DataMarketplace {
         uint256 stakedETH,
         address verificationContract
     );
+
+    event InstaShareContractUpdated(address newAddress);
+
+    // --- 构造函数 ---
+    constructor() {
+        owner = msg.sender;
+    }
+
+    // --- 修饰器 ---
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only owner can call this function");
+        _;
+    }
 
 
     function registerStorageProvider(uint256 availableSpace, uint256 pricePerMBPerMonth, uint256 allowedDeviationPercentage) public payable {
@@ -117,6 +137,22 @@ contract DataMarketplace {
         order.stakedETH = msg.value;
         order.verificationContract = address(verificationContract);
 
+        // 记录用户订单
+        userOrders[msg.sender].push(orderID);
+
+        // 如果设置了InstaShare合约，自动添加存储节点
+        if (instaShareContract != address(0)) {
+            try IInstaShare(instaShareContract).addStorageNode(
+                orderID,
+                provider.providerAddress,
+                storageSpace
+            ) {
+                // 成功添加节点
+            } catch {
+                // 如果添加失败，不影响订单创建
+            }
+        }
+
         // 触发事件
         emit DataOrderCreated(
             orderID,
@@ -160,6 +196,15 @@ contract DataMarketplace {
 
     function getVerificationContractAddress(uint256 orderID) public view returns (address){
         return dataOrders[orderID].verificationContract;
+    }
+
+    function getUserOrders(address user) public view returns (uint256[] memory) {
+        return userOrders[user];
+    }
+
+    function setInstaShareContract(address _instaShareContract) public onlyOwner {
+        instaShareContract = _instaShareContract;
+        emit InstaShareContractUpdated(_instaShareContract);
     }
 }
 

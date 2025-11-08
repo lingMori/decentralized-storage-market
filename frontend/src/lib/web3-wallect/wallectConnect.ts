@@ -13,12 +13,12 @@ const sepolia = {
   rpcUrl: 'https://rpc.sepolia.org'
 }
 
-const buaanet = {
-  chainId: 20250107,
-  name: 'buaanet',
-  currency: 'bcoin',
-  rpcUrl: 'http://111.119.239.159:36054'
-}
+// const buaanet = {
+//   chainId: 20250107,
+//   name: 'buaanet',
+//   currency: 'bcoin',
+//   rpcUrl: 'http://111.119.239.159:36054'
+// }
 
 // 3. Create your application's metadata object
 const metadata = {
