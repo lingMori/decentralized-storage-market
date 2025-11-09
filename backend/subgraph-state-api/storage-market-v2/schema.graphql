@@ -1,33 +1,55 @@
-type DataOrderCreated @entity(immutable: true) {
-  id: Bytes!
-  orderID: BigInt! # uint256
-  providerAddress: Bytes! # address
-  buyerAddress: Bytes! # address
-  storageSpace: BigInt! # uint256
-  totalCost: BigInt! # uint256
-  stakedETH: BigInt! # uint256
-  verificationContract: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+# ==================== 业务实体定义 ====================
+
+# 存储提供商实体
+type StorageProvider @entity(immutable: false) {
+  id: ID!                         # sellID
+  sellID: BigInt!                # 卖单ID
+  providerAddress: Bytes!        # 提供商地址
+  availableSpace: BigInt!        # 可用存储空间 (MB)
+  pricePerMBPerMonth: BigInt!    # 每MB每月的价格 (wei)
+  stakedETH: BigInt!             # 质押的 ETH (wei)
+  isValid: Boolean!              # 是否有效
+  totalOrders: BigInt!           # 总订单数
+  orders: [Order!]! @derivedFrom(field: "provider")  # 该提供商的所有订单
+  createdAt: BigInt!             # 注册时间
+  updatedAt: BigInt!             # 最后更新时间
 }
 
-type InstaShareContractUpdated @entity(immutable: true) {
-  id: Bytes!
-  newAddress: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+# 买家实体
+type Buyer @entity(immutable: false) {
+  id: ID!                        # buyerAddress
+  address: Bytes!                # 买家地址
+  totalOrders: BigInt!           # 总订单数
+  totalSpent: BigInt!            # 总花费 (wei)
+  orders: [Order!]! @derivedFrom(field: "buyer")  # 买家的所有订单
+  createdAt: BigInt!             # 首次购买时间
+  updatedAt: BigInt!             # 最后更新时间
 }
 
-type StorageProviderRegistered @entity(immutable: true) {
-  id: Bytes!
-  sellID: BigInt! # uint256
-  providerAddress: Bytes! # address
-  availableSpace: BigInt! # uint256
-  pricePerMBPerMonth: BigInt! # uint256
-  stakedETH: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+# 订单实体
+type Order @entity(immutable: false) {
+  id: ID!                        # orderID
+  orderID: BigInt!               # 订单ID
+  provider: StorageProvider!     # 存储提供商
+  buyer: Buyer!                  # 购买者
+  storageSpace: BigInt!          # 购买的存储空间 (MB)
+  totalCost: BigInt!             # 订单总成本 (wei)
+  stakedETH: BigInt!             # 质押的 ETH (wei)
+  verificationContract: Bytes!   # 存储验证合约地址
+  createdAt: BigInt!             # 订单创建时间
+  transactionHash: Bytes!        # 交易哈希
+}
+
+# 市场统计信息
+type MarketStats @entity(immutable: false) {
+  id: ID!                        # 固定为 "market"
+  totalProviders: BigInt!        # 总提供商数
+  activeProviders: BigInt!       # 活跃提供商数
+  totalOrders: BigInt!           # 总订单数
+  totalBuyers: BigInt!           # 总买家数
+  totalStorageAvailable: BigInt! # 总可用存储空间 (MB)
+  totalStorageSold: BigInt!      # 已售存储空间 (MB)
+  totalVolume: BigInt!           # 总交易额 (wei)
+  instaShareContract: Bytes      # InstaShare合约地址（可选）
+  updatedAt: BigInt!             # 最后更新时间
 }
