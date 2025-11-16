@@ -14,6 +14,7 @@ contract DataMarketplace {
         uint256 availableSpace; // 可用存储空间 (MB)
         uint256 pricePerMBPerMonth; // 每MB每月的价格 (wei)
         uint256 stakedETH; // 质押的 ETH (wei)
+        string providerEndpoint; // 提供商暴露的 IPFS 网关或服务地址
         bool isValid; // 存储提供商是否有效
     }
 
@@ -41,7 +42,8 @@ contract DataMarketplace {
         address providerAddress,
         uint256 availableSpace,
         uint256 pricePerMBPerMonth,
-        uint256 stakedETH 
+        uint256 stakedETH,
+        string providerEndpoint
     );
 
     event DataOrderCreated(
@@ -68,7 +70,7 @@ contract DataMarketplace {
     }
 
 
-    function registerStorageProvider(uint256 availableSpace, uint256 pricePerMBPerMonth, uint256 allowedDeviationPercentage) public payable {
+    function registerStorageProvider(uint256 availableSpace, uint256 pricePerMBPerMonth, uint256 allowedDeviationPercentage, string calldata providerEndpoint) public payable {
         // 计算需要的质押金额
         uint256 requiredStake = availableSpace * pricePerMBPerMonth;
         uint256 minStake = requiredStake - (requiredStake * allowedDeviationPercentage / 100);
@@ -88,10 +90,11 @@ contract DataMarketplace {
         provider.availableSpace = availableSpace;
         provider.pricePerMBPerMonth = pricePerMBPerMonth;
         provider.stakedETH = msg.value;
+                provider.providerEndpoint = providerEndpoint;
         provider.isValid = true;
 
           // 触发事件
-        emit StorageProviderRegistered(sellID, msg.sender, availableSpace, pricePerMBPerMonth, msg.value);
+                emit StorageProviderRegistered(sellID, msg.sender, availableSpace, pricePerMBPerMonth, msg.value, providerEndpoint);
     }
 
    function createDataOrder(uint256 sellID) public payable {

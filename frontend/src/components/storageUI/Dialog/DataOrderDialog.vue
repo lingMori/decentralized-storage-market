@@ -338,6 +338,7 @@ interface Props {
 const props = defineProps<Props>()
 const emit = defineEmits<{
   'update:isOpen': [value: boolean]
+  'order-completed': []
 }>()
 
 // 状态管理
@@ -550,6 +551,9 @@ async function handlePurchase(): Promise<void> {
       description: `您已成功购买 ${purchaseAmount.value}${purchaseUnit.value} 存储空间，时长 ${purchaseDuration.value} 个月！`,
       variant: "default"
     })
+
+    // 触发订单完成事件
+    emit('order-completed')
 
     // 关闭对话框并刷新数据
     closePurchaseDialog()

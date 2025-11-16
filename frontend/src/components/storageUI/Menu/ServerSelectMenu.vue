@@ -128,7 +128,7 @@ const updateDialogStatus = (value: boolean) => {
 const handleOrderCompleted = async () => {
   try {
     // 刷新节点列表
-    await ipfsStore.fetchAvaliableNodes("aaa")
+    // await ipfsStore.fetchAvaliableNodes("aaa")
     
     toast({
       title: "服务器添加成功",
