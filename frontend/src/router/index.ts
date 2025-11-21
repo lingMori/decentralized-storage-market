@@ -48,6 +48,26 @@ const routes: RouteRecordRaw[] = [
         name: 'Test',
         component: () => import("@/pages/dashboard/Test.vue")
     },
+    {
+        path: '/storage-market',
+        name: 'StorageMarket',
+        component: () => import("@/pages/StorageMarket.vue")
+    },
+    {
+        path: '/marketplace',
+        name: 'Marketplace',
+        component: () => import("@/pages/Marketplace.vue")
+    },
+    {
+        path: '/provider/:sellID',
+        name: 'ProviderDetail',
+        component: () => import("@/pages/ProviderDetail.vue")
+    },
+    {
+        path: '/orders',
+        name: 'Orders',
+        component: () => import("@/pages/Orders.vue")
+    },
     // 添加通配符路由
     {
         path: '/:pathMatch(.*)*',

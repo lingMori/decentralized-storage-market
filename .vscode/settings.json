@@ -10,7 +10,7 @@
     "editor.lineNumbers": "interval",
     "editor.renderWhitespace": "boundary",
     "window.autoDetectColorScheme": false,  // 自动检测当前环境theme（macOS）
-    "workbench.colorTheme": "Vitesse Dark",
+    "workbench.colorTheme": "Default Dark Modern",
     "workbench.editor.tabActionLocation": "left",
     "workbench.fontAliasing": "antialiased",
     "workbench.iconTheme": "catppuccin-macchiato",
