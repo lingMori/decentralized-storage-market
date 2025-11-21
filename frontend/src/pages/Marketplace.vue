@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <TopNav />
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+  <div style="height: 100vh;">
+    <DashboardHeader />
+    <div :style="{ position: 'relative', top: `${headerHeight}px` }" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       <div class="flex items-center justify-between">
         <h1 class="text-2xl font-semibold">存储市场</h1>
       </div>
@@ -35,7 +35,7 @@
 import { onMounted, ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
-import TopNav from '@/components/common/TopNav.vue'
+import DashboardHeader from '@/components/storageUI/Header/DashboardHeader.vue'
 import ProviderCard from '@/components/market/ProviderCard.vue'
 import { useStorageMarketStore } from '@/store/storageMarket'
 
@@ -66,6 +66,16 @@ const goDetail = (sellID: number) => router.push(`/provider/${sellID}`)
 onMounted(() => {
   // 自动加载（当合约地址未配置时会自动回退至演示数据）
   loadProviders()
+})
+
+const headerHeight = ref(0)
+const updateHeaderHeight = () => {
+  const header = document.querySelector('header')
+  if (header) headerHeight.value = (header as HTMLElement).offsetHeight
+}
+onMounted(() => {
+  updateHeaderHeight()
+  window.addEventListener('resize', updateHeaderHeight)
 })
 </script>
 

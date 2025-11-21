@@ -6,7 +6,10 @@
         <span class="font-semibold">InstaShare</span>
       </div>
       <nav class="flex items-center gap-6 text-sm">
-        <RouterLink to="/marketplace" class="text-zinc-300 hover:text-white">市场</RouterLink>
+        <RouterLink to="/marketplace" class="flex items-center gap-1 text-zinc-300 hover:text-white">
+          <Store class="w-4 h-4" />
+          <span>市场</span>
+        </RouterLink>
         <RouterLink to="/orders" class="text-zinc-300 hover:text-white">我的订单</RouterLink>
       </nav>
       <div class="flex items-center gap-2">
@@ -19,6 +22,7 @@
 
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
+import { Store } from 'lucide-vue-next'
 </script>
 
 <style scoped>

@@ -1,6 +1,8 @@
 <template>
-  <div class="p-6 space-y-6">
-    <h1 class="text-2xl font-semibold">存储市场（DataMarketplace）</h1>
+  <div style="height: 100vh;">
+    <DashboardHeader />
+    <div :style="{ position: 'relative', top: `${headerHeight}px` }" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <h1 class="text-2xl font-semibold">存储市场</h1>
 
     <div class="flex items-center gap-4">
       <button class="px-3 py-2 bg-blue-600 text-white rounded" @click="loadProviders" :disabled="loadingProviders">加载提供商</button>
@@ -96,6 +98,7 @@
         <p v-else class="text-gray-500 text-sm">无数据</p>
       </div>
     </div>
+    </div>
   </div>
 </template>
 
@@ -103,6 +106,13 @@
 import { storeToRefs } from 'pinia'
 import { useStorageMarketStore } from '@/store/storageMarket'
 import { onMounted, ref } from 'vue'
+import DashboardHeader from '@/components/storageUI/Header/DashboardHeader.vue'
+
+const headerHeight = ref(0)
+const updateHeaderHeight = () => {
+  const header = document.querySelector('header')
+  if (header) headerHeight.value = (header as HTMLElement).offsetHeight
+}
 
 const store = useStorageMarketStore()
 const { providers, orders, provider, order, error, loadingProviders, loadingOrders } = storeToRefs(store)
@@ -124,6 +134,8 @@ onMounted(() => {
   // 可选择自动加载
   // loadProviders();
   // loadOrders();
+  updateHeaderHeight()
+  window.addEventListener('resize', updateHeaderHeight)
 })
 </script>
 

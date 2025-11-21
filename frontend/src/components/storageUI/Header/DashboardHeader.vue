@@ -9,6 +9,7 @@
         <router-link :to="{ name: 'Upload' }" active-class="active" exact>Home</router-link>
         <router-link :to="{ name: 'Filebox' }" active-class="active" exact>File Box</router-link>
         <router-link :to="{ name: 'Public' }" active-class="active">Public</router-link>
+        <router-link :to="{ name: 'Marketplace' }" active-class="active">Market</router-link>
         <w3m-button style="margin: 0px 7px;" label="wallet connect" />
         <i :title="`Switch to ${isDark ? 'Light' : 'Dark'} Theme`">
           <i-mdi-brightness-7 v-if="isDark" class="icon-color" @click="toggleTheme" />
